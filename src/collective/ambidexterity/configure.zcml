@@ -29,6 +29,14 @@
       post_handler=".setuphandlers.uninstall"
       />
 
+  <genericsetup:registerProfile
+      name="testing"
+      title="Ambidexterity Test Content Types"
+      description="Adds simple Dexterity-based types for testing."
+      directory="profiles/testing"
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      for="Products.CMFPlone.interfaces.ITestCasePloneSiteRoot"
+      />
 
   <utility
       factory=".setuphandlers.HiddenProfiles"

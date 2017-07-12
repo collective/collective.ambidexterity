@@ -23,7 +23,6 @@ class CollectiveAmbidexterityLayer(PloneSandboxLayer):
     def setUpPloneSite(self, portal):
         applyProfile(portal, 'collective.ambidexterity:default')
 
-
 COLLECTIVE_AMBIDEXTERITY_FIXTURE = CollectiveAmbidexterityLayer()
 
 
