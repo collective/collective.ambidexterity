@@ -1,0 +1,5 @@
+====================
+collective.ambidexterity
+====================
+
+User documentation
