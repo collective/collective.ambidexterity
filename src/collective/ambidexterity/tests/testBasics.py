@@ -23,6 +23,12 @@ class TestSetup(unittest.TestCase):
         self.portal = self.layer['portal']
         applyProfile(self.portal, 'collective.ambidexterity:testing')
 
+        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('test_me')
+        script = self.portal.portal_resources.test_me
+        # order important here. bindings must be cleared before we can set 'context' as a parameter.
+        script.ZBindings_edit([])
+        script.ZPythonScript_edit('context', 'return u"test script %s" % context.title')
+
         self.my_object = dottedname_resolve('collective.ambidexterity.tests.classtest.method_binder_object')
         self.my_method = dottedname_resolve('collective.ambidexterity.tests.classtest.method_binder_object.default')
         self.my_method2 = dottedname_resolve('collective.ambidexterity.tests.classtest.method_binder_object.default2')
@@ -54,3 +60,15 @@ class TestSetup(unittest.TestCase):
     def test_string_default(self):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         self.assertEqual(test_item.test_string_field, u'The Meaning of Life is 42')
+
+    def test_script(self):
+        self.assertEqual(self.portal.portal_resources.test_me(self.portal), u'test script Plone site')
+
+    def test_script_via_dots(self):
+        sample_method = dottedname_resolve(
+            'collective.ambidexterity.tests.classtest.test_obj.sample1.default3')
+        self.assertEqual(sample_method(self.portal), 'test script Plone site')
+
+    def test_default_from_script(self):
+        test_item = createContent('simple_test_type', title=u'The Meaning of Life')
+        self.assertEqual(test_item.test_string_field2, u'test script The Meaning of Life')
