@@ -15,17 +15,17 @@ from zope.schema.interfaces import IContextAwareDefaultFactory
 import unittest
 
 
-class DottedValidator(SimpleFieldValidator):
-    """ SimpleFieldValidator that calls a dotted path
+class ScriptedValidator(SimpleFieldValidator):
+    """ SimpleFieldValidator that calls a Python Script
         for simple validation. """
 
-    # a class property to hold the dotted path
-    dotted_path = None
+    # script callable
+    validator_script = None
 
     def validate(self, value):
-        super(DottedValidator, self).validate(value)
+        super(ScriptedValidator, self).validate(value)
 
-        result = dottedname_resolve(self.dotted_path)
+        result = self.validator_script(value)
         if getattr(result, 'lower', None) is not None:
             raise Invalid(result)
 
@@ -77,9 +77,21 @@ class TestSetup(unittest.TestCase):
         script.ZBindings_edit([])
         script.ZPythonScript_edit('context', 'return u"test script %s" % context.title')
 
+        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('validator_script')
+        script = self.portal.portal_resources.validator_script
+        script.ZBindings_edit([])
+        script.ZPythonScript_edit('value', 'return u"value is %s" % value')
+
         self.my_object = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object')
         self.my_method = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object.default')
         self.my_method2 = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object.default2')
+
+        sample = test_obj.sample1
+        sample.validator = type(
+            'sample_validator',
+            (ScriptedValidator,),
+            dict(validator_script=api.portal.get_tool(name='portal_resources').validator_script),
+        )
 
     def test_resolve(self):
         self.assertIsInstance(self.my_object, MethodBinder)
@@ -120,6 +132,15 @@ class TestSetup(unittest.TestCase):
     def test_default_from_script(self):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         self.assertEqual(test_item.test_string_field2, u'test script The Meaning of Life')
+
+    def test_validator_script(self):
+        self.assertEqual(self.portal.portal_resources.validator_script(42), u"value is 42")
+
+    def test_validator_via_dots(self):
+        sample1 = dottedname_resolve(
+            'collective.ambidexterity.tests.testBasics.test_obj.sample1')
+        self.assertEqual(sample1.validator.validator_script(42), u'value is 42')
+
 
 """
 notes
