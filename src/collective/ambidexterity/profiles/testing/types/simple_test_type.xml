@@ -35,7 +35,10 @@
         &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.method_binder_object.default&lt;/defaultFactory&gt;
         &lt;title&gt;Test Integer Field&lt;/title&gt;
       &lt;/field&gt;
-      &lt;field name="test_string_field" type="zope.schema.TextLine"&gt;
+      &lt;field name="test_string_field"
+        type="zope.schema.TextLine"
+        form:validator="collective.ambidexterity.tests.testBasics.test_obj.node.validator"
+      &gt;
         &lt;description/&gt;
         &lt;required&gt;False&lt;/required&gt;
         &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.method_binder_object.default2&lt;/defaultFactory&gt;

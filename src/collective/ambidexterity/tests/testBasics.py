@@ -32,6 +32,8 @@ class ScriptedValidator(SimpleFieldValidator):
 
 class MethodBinder():
 
+    validator = None
+
     @provider(IContextAwareDefaultFactory)
     def default(self, context):
         return 42
@@ -67,6 +69,19 @@ class TestSetup(unittest.TestCase):
     def setUp(self):
         """Custom shared utility setup for tests."""
         self.portal = self.layer['portal']
+
+        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('validator_script')
+        script = self.portal.portal_resources.validator_script
+        script.ZBindings_edit([])
+        script.ZPythonScript_edit('value', 'return u"value is %s" % value')
+
+        global test_obj
+        test_obj.node.validator = type(
+            'sample_validator',
+            (ScriptedValidator,),
+            dict(validator_script=api.portal.get_tool(name='portal_resources').validator_script),
+        )
+
         applyProfile(self.portal, 'collective.ambidexterity:testing')
 
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
@@ -77,21 +92,9 @@ class TestSetup(unittest.TestCase):
         script.ZBindings_edit([])
         script.ZPythonScript_edit('context', 'return u"test script %s" % context.title')
 
-        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('validator_script')
-        script = self.portal.portal_resources.validator_script
-        script.ZBindings_edit([])
-        script.ZPythonScript_edit('value', 'return u"value is %s" % value')
-
         self.my_object = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object')
         self.my_method = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object.default')
         self.my_method2 = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object.default2')
-
-        sample = test_obj.sample1
-        sample.validator = type(
-            'sample_validator',
-            (ScriptedValidator,),
-            dict(validator_script=api.portal.get_tool(name='portal_resources').validator_script),
-        )
 
     def test_resolve(self):
         self.assertIsInstance(self.my_object, MethodBinder)
@@ -137,9 +140,9 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(self.portal.portal_resources.validator_script(42), u"value is 42")
 
     def test_validator_via_dots(self):
-        sample1 = dottedname_resolve(
-            'collective.ambidexterity.tests.testBasics.test_obj.sample1')
-        self.assertEqual(sample1.validator.validator_script(42), u'value is 42')
+        validator = dottedname_resolve(
+            'collective.ambidexterity.tests.testBasics.test_obj.node.validator')
+        self.assertEqual(validator.validator_script(42), u'value is 42')
 
 
 """
