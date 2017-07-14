@@ -6,7 +6,10 @@ from new import instancemethod
 from plone import api
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
+from plone.dexterity.utils import createContentInContainer
 from z3c.form.validator import SimpleFieldValidator
+from z3c.form.interfaces import IValidator
+from zope.component import queryMultiAdapter
 from zope.dottedname.resolve import resolve as dottedname_resolve
 from zope.interface import Invalid
 from zope.interface import provider
@@ -14,25 +17,30 @@ from zope.schema.interfaces import IContextAwareDefaultFactory
 
 import unittest
 
+"""
+TODO
+Build (and destroy) global name space as it's resolved (via dottedname_resolve)
+"""
+
+# We're going to store references to validator script callables in
+# a dictionary that's indexed by the class name of the copy of
+# ScriptedValidator that we're saving at a dotted address.
+validator_scripts = {}
+
 
 class ScriptedValidator(SimpleFieldValidator):
     """ SimpleFieldValidator that calls a Python Script
         for simple validation. """
 
-    # script callable
-    validator_script = None
-
     def validate(self, value):
         super(ScriptedValidator, self).validate(value)
 
-        result = self.validator_script(value)
+        result = validator_scripts[self.__class__.__name__](value)
         if getattr(result, 'lower', None) is not None:
             raise Invalid(result)
 
 
 class MethodBinder():
-
-    validator = None
 
     @provider(IContextAwareDefaultFactory)
     def default(self, context):
@@ -40,7 +48,7 @@ class MethodBinder():
 
     @provider(IContextAwareDefaultFactory)
     def default2(self, context):
-        return context.title + ' is 42'
+        return context.title + u' is 42'
 
     @provider(IContextAwareDefaultFactory)
     def default3(self, context):
@@ -73,14 +81,17 @@ class TestSetup(unittest.TestCase):
         self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('validator_script')
         script = self.portal.portal_resources.validator_script
         script.ZBindings_edit([])
-        script.ZPythonScript_edit('value', 'return u"value is %s" % value')
+        script.ZPythonScript_edit('value', 'if u"bad" in value.lower():\n  return u"value is bad: %s" % value')
 
         global test_obj
         test_obj.node.validator = type(
-            'sample_validator',
+            'CopyOfScriptedValidator',
             (ScriptedValidator,),
             dict(validator_script=api.portal.get_tool(name='portal_resources').validator_script),
         )
+
+        global validator_scripts
+        validator_scripts['CopyOfScriptedValidator'] = api.portal.get_tool(name='portal_resources').validator_script
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
 
@@ -137,12 +148,24 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(test_item.test_string_field2, u'test script The Meaning of Life')
 
     def test_validator_script(self):
-        self.assertEqual(self.portal.portal_resources.validator_script(42), u"value is 42")
+        self.assertEqual(self.portal.portal_resources.validator_script('bad 42'), u"value is bad: bad 42")
+        self.assertEqual(self.portal.portal_resources.validator_script('good 42'), None)
 
     def test_validator_via_dots(self):
         validator = dottedname_resolve(
             'collective.ambidexterity.tests.testBasics.test_obj.node.validator')
-        self.assertEqual(validator.validator_script(42), u'value is 42')
+        self.assertEqual(validator.validator_script('bad 42'), u'value is bad: bad 42')
+
+    def test_validator_via_item(self):
+        fti = self.portal.portal_types.simple_test_type
+        schema = fti.lookupSchema()
+        field = schema.get('test_string_field')
+        ValidatorClass = test_obj.node.validator
+        validator = ValidatorClass(None, None, None, field, None)
+        validator.validate(u'good input')
+        with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
+            validator.validate(u'bad input')
+
 
 
 """
