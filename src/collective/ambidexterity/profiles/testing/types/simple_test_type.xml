@@ -32,7 +32,7 @@
       &lt;field name="test_integer_field" type="zope.schema.Int"&gt;
         &lt;description/&gt;
         &lt;required&gt;False&lt;/required&gt;
-        &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.method_binder_object.default&lt;/defaultFactory&gt;
+        &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.test_obj.node.integer_default.default&lt;/defaultFactory&gt;
         &lt;title&gt;Test Integer Field&lt;/title&gt;
       &lt;/field&gt;
       &lt;field name="test_string_field"
@@ -41,14 +41,8 @@
       &gt;
         &lt;description/&gt;
         &lt;required&gt;False&lt;/required&gt;
-        &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.method_binder_object.default2&lt;/defaultFactory&gt;
+        &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.test_obj.node.string_default.default&lt;/defaultFactory&gt;
         &lt;title&gt;Test String Field&lt;/title&gt;
-      &lt;/field&gt;
-      &lt;field name="test_string_field2" type="zope.schema.TextLine"&gt;
-        &lt;description/&gt;
-        &lt;required&gt;False&lt;/required&gt;
-        &lt;title&gt;Test String Field2&lt;/title&gt;
-        &lt;defaultFactory&gt;collective.ambidexterity.tests.testBasics.test_obj.sample1.default3&lt;/defaultFactory&gt;
       &lt;/field&gt;
     &lt;/schema&gt;
   &lt;/model&gt;</property>

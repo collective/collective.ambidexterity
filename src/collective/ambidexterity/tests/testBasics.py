@@ -26,11 +26,13 @@ Build (and destroy) global name space as it's resolved (via dottedname_resolve)
 # a dictionary that's indexed by the class name of the copy of
 # ScriptedValidator that we're saving at a dotted address.
 validator_scripts = {}
+default_scripts = {}
 
 
 class ScriptedValidator(SimpleFieldValidator):
     """ SimpleFieldValidator that calls a Python Script
-        for simple validation. """
+        for simple validation.
+    """
 
     def validate(self, value):
         super(ScriptedValidator, self).validate(value)
@@ -40,32 +42,21 @@ class ScriptedValidator(SimpleFieldValidator):
             raise Invalid(result)
 
 
-class MethodBinder():
+class ScriptedDefault(object):
+    """ class to contain a Dexterity field validator that calls
+        a Python Script for the default.
+    """
 
     @provider(IContextAwareDefaultFactory)
     def default(self, context):
-        return 42
-
-    @provider(IContextAwareDefaultFactory)
-    def default2(self, context):
-        return context.title + u' is 42'
-
-    @provider(IContextAwareDefaultFactory)
-    def default3(self, context):
-        portal_resources = api.portal.get_tool(name='portal_resources')
-        return portal_resources.test_me(context)
-
+        return default_scripts[self.__class__.__name__](context)
 
 class SimpleClass():
     pass
 
 
-method_binder_object = MethodBinder()
-
 test_obj = SimpleClass()
-test_obj.sample1 = MethodBinder()
 test_obj.node = SimpleClass()
-test_obj.node.sample2 = MethodBinder()
 
 
 class TestSetup(unittest.TestCase):
@@ -83,49 +74,46 @@ class TestSetup(unittest.TestCase):
         script.ZBindings_edit([])
         script.ZPythonScript_edit('value', 'if u"bad" in value.lower():\n  return u"value is bad: %s" % value')
 
+        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('string_default')
+        script = self.portal.portal_resources.string_default
+        # order important here. bindings must be cleared before we can set 'context' as a parameter.
+        script.ZBindings_edit([])
+        script.ZPythonScript_edit('context', 'return u"default script %s" % context.title')
+
+        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('integer_default')
+        script = self.portal.portal_resources.integer_default
+        # order important here. bindings must be cleared before we can set 'context' as a parameter.
+        script.ZBindings_edit([])
+        script.ZPythonScript_edit('context', 'return 42')
+
         global test_obj
+        global validator_scripts
+        global default_scripts
+
         test_obj.node.validator = type(
             'CopyOfScriptedValidator',
             (ScriptedValidator,),
-            dict(validator_script=api.portal.get_tool(name='portal_resources').validator_script),
+            {},
         )
-
-        global validator_scripts
         validator_scripts['CopyOfScriptedValidator'] = api.portal.get_tool(name='portal_resources').validator_script
 
+        test_obj.node.string_default = type(
+            'StringDefault',
+            (ScriptedDefault,),
+            {},
+        )
+        validator_scripts['StringDefault'] = api.portal.get_tool(name='portal_resources').string_default
+
+        test_obj.node.integer_default = type(
+            'IntegerDefault',
+            (ScriptedDefault,),
+            {},
+        )
+        validator_scripts['IntegerDefault'] = api.portal.get_tool(name='portal_resources').integer_default
+
+
         applyProfile(self.portal, 'collective.ambidexterity:testing')
-
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
-
-        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('test_me')
-        script = self.portal.portal_resources.test_me
-        # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        script.ZBindings_edit([])
-        script.ZPythonScript_edit('context', 'return u"test script %s" % context.title')
-
-        self.my_object = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object')
-        self.my_method = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object.default')
-        self.my_method2 = dottedname_resolve('collective.ambidexterity.tests.testBasics.method_binder_object.default2')
-
-    def test_resolve(self):
-        self.assertIsInstance(self.my_object, MethodBinder)
-        self.assertIsInstance(self.my_method, instancemethod)
-        self.assertTrue(IContextAwareDefaultFactory.providedBy(self.my_method))
-        self.assertEqual(self.my_method(None), 42)
-        self.assertEqual(self.my_method(self.portal), 42)
-        self.assertEqual(self.my_method2(self.portal), u'Plone site is 42')
-
-    def test_dict_resolve(self):
-        sample_method = dottedname_resolve(
-            'collective.ambidexterity.tests.testBasics.test_obj.sample1.default')
-        self.assertTrue(IContextAwareDefaultFactory.providedBy(sample_method))
-        self.assertEqual(sample_method(None), 42)
-
-    def test_depth_resolve(self):
-        sample_method = dottedname_resolve(
-            'collective.ambidexterity.tests.testBasics.test_obj.node.sample2.default2')
-        self.assertTrue(IContextAwareDefaultFactory.providedBy(sample_method))
-        self.assertEqual(sample_method(self.portal), u'Plone site is 42')
 
     def test_integer_default(self):
         test_item = createContent('simple_test_type', title=u'Test Item')
@@ -133,19 +121,7 @@ class TestSetup(unittest.TestCase):
 
     def test_string_default(self):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
-        self.assertEqual(test_item.test_string_field, u'The Meaning of Life is 42')
-
-    def test_script(self):
-        self.assertEqual(self.portal.portal_resources.test_me(self.portal), u'test script Plone site')
-
-    def test_script_via_dots(self):
-        sample_method = dottedname_resolve(
-            'collective.ambidexterity.tests.testBasics.test_obj.sample1.default3')
-        self.assertEqual(sample_method(self.portal), 'test script Plone site')
-
-    def test_default_from_script(self):
-        test_item = createContent('simple_test_type', title=u'The Meaning of Life')
-        self.assertEqual(test_item.test_string_field2, u'test script The Meaning of Life')
+        self.assertEqual(test_item.test_string_field, u'test script Plone site')
 
     def test_validator_script(self):
         self.assertEqual(self.portal.portal_resources.validator_script('bad 42'), u"value is bad: bad 42")
