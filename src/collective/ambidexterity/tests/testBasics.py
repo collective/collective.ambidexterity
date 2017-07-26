@@ -5,14 +5,12 @@ from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATIO
 from plone import api
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
-from plone.dexterity.utils import createContentInContainer
 from z3c.form.validator import SimpleFieldValidator
-from z3c.form.interfaces import IValidator
-from zope.component import queryMultiAdapter
-from zope.dottedname.resolve import resolve as dottedname_resolve
 from zope.interface import Invalid
 from zope.interface import provider
 from zope.schema.interfaces import IContextAwareDefaultFactory
+from zope.schema.interfaces import IContextSourceBinder
+from zope.schema.vocabulary import SimpleVocabulary
 
 import unittest
 
@@ -25,7 +23,6 @@ Build (and destroy) global name space as it's resolved (via dottedname_resolve)
 # a dictionary that's indexed by the class name of the copy of
 # ScriptedValidator that we're saving at a dotted address.
 validator_scripts = {}
-default_scripts = {}
 
 
 class ScriptedValidator(SimpleFieldValidator):
@@ -50,14 +47,23 @@ def defaultFunctionFactory(scripted_default_function):
     return default
 
 
-class ScriptedDefault(object):
-    """ class to contain a Dexterity field validator that calls
-        a Python Script for the default.
-    """
+def vocabularyFunctionFactory(scripted_vocabulary_function):
 
-    @provider(IContextAwareDefaultFactory)
-    def default(self, context):
-        return default_scripts[self.__class__.__name__](context)
+    @provider(IContextSourceBinder)
+    def vocabulary(context):
+        result = scripted_vocabulary_function(context)
+        if len(result) > 0:
+            if len(result[0]) == 1:
+                return SimpleVocabulary.fromValues(result)
+            elif len(result[0]) == 2:
+                return SimpleVocabulary.fromItems(result)
+            else:
+                raise ValueError(
+                    'Vocabulary scripts must return lists of values or items.'
+                )
+        return SimpleVocabulary([])
+
+    return vocabulary
 
 
 class SimpleClass():
@@ -95,9 +101,14 @@ class TestSetup(unittest.TestCase):
         script.ZBindings_edit([])
         script.ZPythonScript_edit('context', 'return 42')
 
+        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('test_vocabulary')
+        script = self.portal.portal_resources.test_vocabulary
+        # order important here. bindings must be cleared before we can set 'context' as a parameter.
+        script.ZBindings_edit([])
+        script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
+
         global test_obj
         global validator_scripts
-        global default_scripts
 
         test_obj.node.validator = type(
             'CopyOfScriptedValidator',
@@ -108,6 +119,7 @@ class TestSetup(unittest.TestCase):
 
         test_obj.node.integer_default = defaultFunctionFactory(self.portal.portal_resources.integer_default)
         test_obj.node.string_default = defaultFunctionFactory(self.portal.portal_resources.string_default)
+        test_obj.node.test_vocabulary = vocabularyFunctionFactory(self.portal.portal_resources.test_vocabulary)
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
@@ -133,6 +145,14 @@ class TestSetup(unittest.TestCase):
     def test_string_default(self):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         self.assertEqual(test_item.test_string_field, u'default script The Meaning of Life')
+
+    def test_validator(self):
+        fti = self.portal.portal_types.simple_test_type
+        schema = fti.lookupSchema()
+        field = schema.get('test_choice_field')
+        source = field.source
+        self.assertEqual(type(source(self)), type(SimpleVocabulary.fromItems([])))
+        self.assertEqual([s.value for s in source(self)], [u'a', u'b', u'c'])
 
 """
 notes
