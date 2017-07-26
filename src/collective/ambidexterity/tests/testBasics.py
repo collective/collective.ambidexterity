@@ -19,11 +19,6 @@ TODO
 Build (and destroy) global name space as it's resolved (via dottedname_resolve)
 """
 
-# We're going to store references to validator script callables in
-# a dictionary that's indexed by the class name of the copy of
-# ScriptedValidator that we're saving at a dotted address.
-validator_scripts = {}
-
 
 class ScriptedValidator(SimpleFieldValidator):
     """ SimpleFieldValidator that calls a Python Script
@@ -79,12 +74,21 @@ def vocabularyFunctionFactory(scripted_vocabulary_function):
     return vocabulary
 
 
-class SimpleClass():
-    pass
+class DottedPathNode():
+    """ A node in a dotted path that may contain
+        other nodes, a default, a validator and/or a vocabulary.
+    """
 
+    def __init__(self, dotted_path):
+        self.dotted_path = dotted_path
 
-test_obj = SimpleClass()
-test_obj.node = SimpleClass()
+# global!
+resources = DottedPathNode('')
+
+# We're going to store references to validator script callables in
+# a dictionary that's indexed by the class name of the copy of
+# ScriptedValidator that we're saving at a dotted address.
+validator_scripts = {}
 
 
 class TestSetup(unittest.TestCase):
@@ -120,15 +124,25 @@ class TestSetup(unittest.TestCase):
         script.ZBindings_edit([])
         script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
 
-        global test_obj
+        global resources
+        resources.simple_test_type = DottedPathNode('')
+        resources.simple_test_type.test_integer_field = DottedPathNode('')
+        resources.simple_test_type.test_string_field = DottedPathNode('')
+        resources.simple_test_type.test_choice_field = DottedPathNode('')
 
-        test_obj.node.validator = validatorClassFactory(
+        resources.simple_test_type.test_string_field.validator = validatorClassFactory(
             'ambidexterity.simple_test_type.test_string_field.validator',
             api.portal.get_tool(name='portal_resources').validator_script,
         )
-        test_obj.node.integer_default = defaultFunctionFactory(self.portal.portal_resources.integer_default)
-        test_obj.node.string_default = defaultFunctionFactory(self.portal.portal_resources.string_default)
-        test_obj.node.test_vocabulary = vocabularyFunctionFactory(self.portal.portal_resources.test_vocabulary)
+        resources.simple_test_type.test_integer_field.default = defaultFunctionFactory(
+            self.portal.portal_resources.integer_default
+        )
+        resources.simple_test_type.test_string_field.default = defaultFunctionFactory(
+            self.portal.portal_resources.string_default
+        )
+        resources.simple_test_type.test_choice_field.vocabulary = vocabularyFunctionFactory(
+            self.portal.portal_resources.test_vocabulary
+        )
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
@@ -141,7 +155,7 @@ class TestSetup(unittest.TestCase):
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
         field = schema.get('test_string_field')
-        validator_class = test_obj.node.validator
+        validator_class = resources.simple_test_type.test_string_field.validator
         validator = validator_class(None, None, None, field, None)
         validator.validate(u'good input')
         with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
