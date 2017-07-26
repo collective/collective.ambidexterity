@@ -2,7 +2,6 @@
 """Idea tests for this package."""
 
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
-from new import instancemethod
 from plone import api
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
@@ -42,6 +41,15 @@ class ScriptedValidator(SimpleFieldValidator):
             raise Invalid(result)
 
 
+def defaultFunctionFactory(scripted_default_function):
+
+    @provider(IContextAwareDefaultFactory)
+    def default(context):
+        return scripted_default_function(context)
+
+    return default
+
+
 class ScriptedDefault(object):
     """ class to contain a Dexterity field validator that calls
         a Python Script for the default.
@@ -50,6 +58,7 @@ class ScriptedDefault(object):
     @provider(IContextAwareDefaultFactory)
     def default(self, context):
         return default_scripts[self.__class__.__name__](context)
+
 
 class SimpleClass():
     pass
@@ -97,23 +106,25 @@ class TestSetup(unittest.TestCase):
         )
         validator_scripts['CopyOfScriptedValidator'] = api.portal.get_tool(name='portal_resources').validator_script
 
-        test_obj.node.string_default = type(
-            'StringDefault',
-            (ScriptedDefault,),
-            {},
-        )
-        validator_scripts['StringDefault'] = api.portal.get_tool(name='portal_resources').string_default
-
-        test_obj.node.integer_default = type(
-            'IntegerDefault',
-            (ScriptedDefault,),
-            {},
-        )
-        validator_scripts['IntegerDefault'] = api.portal.get_tool(name='portal_resources').integer_default
-
+        test_obj.node.integer_default = defaultFunctionFactory(self.portal.portal_resources.integer_default)
+        test_obj.node.string_default = defaultFunctionFactory(self.portal.portal_resources.string_default)
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
+
+    def test_validator_script(self):
+        self.assertEqual(self.portal.portal_resources.validator_script('bad 42'), u"value is bad: bad 42")
+        self.assertEqual(self.portal.portal_resources.validator_script('good 42'), None)
+
+    def test_validator_via_item(self):
+        fti = self.portal.portal_types.simple_test_type
+        schema = fti.lookupSchema()
+        field = schema.get('test_string_field')
+        validator_class = test_obj.node.validator
+        validator = validator_class(None, None, None, field, None)
+        validator.validate(u'good input')
+        with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
+            validator.validate(u'bad input')
 
     def test_integer_default(self):
         test_item = createContent('simple_test_type', title=u'Test Item')
@@ -121,28 +132,7 @@ class TestSetup(unittest.TestCase):
 
     def test_string_default(self):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
-        self.assertEqual(test_item.test_string_field, u'test script Plone site')
-
-    def test_validator_script(self):
-        self.assertEqual(self.portal.portal_resources.validator_script('bad 42'), u"value is bad: bad 42")
-        self.assertEqual(self.portal.portal_resources.validator_script('good 42'), None)
-
-    def test_validator_via_dots(self):
-        validator = dottedname_resolve(
-            'collective.ambidexterity.tests.testBasics.test_obj.node.validator')
-        self.assertEqual(validator.validator_script('bad 42'), u'value is bad: bad 42')
-
-    def test_validator_via_item(self):
-        fti = self.portal.portal_types.simple_test_type
-        schema = fti.lookupSchema()
-        field = schema.get('test_string_field')
-        ValidatorClass = test_obj.node.validator
-        validator = ValidatorClass(None, None, None, field, None)
-        validator.validate(u'good input')
-        with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
-            validator.validate(u'bad input')
-
-
+        self.assertEqual(test_item.test_string_field, u'default script The Meaning of Life')
 
 """
 notes
