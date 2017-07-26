@@ -38,6 +38,19 @@ class ScriptedValidator(SimpleFieldValidator):
             raise Invalid(result)
 
 
+def validatorClassFactory(dotted_path, scripted_validator_function):
+    """ return a validator class whose name is a validator_scripts key.
+    """
+
+    global validator_scripts
+    validator_scripts[dotted_path] = scripted_validator_function
+    return type(
+        dotted_path,
+        (ScriptedValidator,),
+        {},
+    )
+
+
 def defaultFunctionFactory(scripted_default_function):
 
     @provider(IContextAwareDefaultFactory)
@@ -108,15 +121,11 @@ class TestSetup(unittest.TestCase):
         script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
 
         global test_obj
-        global validator_scripts
 
-        test_obj.node.validator = type(
-            'CopyOfScriptedValidator',
-            (ScriptedValidator,),
-            {},
+        test_obj.node.validator = validatorClassFactory(
+            'ambidexterity.simple_test_type.test_string_field.validator',
+            api.portal.get_tool(name='portal_resources').validator_script,
         )
-        validator_scripts['CopyOfScriptedValidator'] = api.portal.get_tool(name='portal_resources').validator_script
-
         test_obj.node.integer_default = defaultFunctionFactory(self.portal.portal_resources.integer_default)
         test_obj.node.string_default = defaultFunctionFactory(self.portal.portal_resources.string_default)
         test_obj.node.test_vocabulary = vocabularyFunctionFactory(self.portal.portal_resources.test_vocabulary)
@@ -146,7 +155,7 @@ class TestSetup(unittest.TestCase):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         self.assertEqual(test_item.test_string_field, u'default script The Meaning of Life')
 
-    def test_validator(self):
+    def test_vocabulary(self):
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
         field = schema.get('test_choice_field')
