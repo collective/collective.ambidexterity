@@ -1,97 +1,16 @@
 # -*- coding: utf-8 -*-
 """Idea tests for this package."""
 
+from collective.ambidexterity.resources import DottedPathNode
+from collective.ambidexterity import resources
+from collective.ambidexterity import factories
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
-from plone import api
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
-from z3c.form.validator import SimpleFieldValidator
 from zope.interface import Invalid
-from zope.interface import provider
-from zope.schema.interfaces import IContextAwareDefaultFactory
-from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary
 
 import unittest
-
-"""
-TODO
-Build (and destroy) global name space as it's resolved (via dottedname_resolve)
-"""
-
-# I probably need to store a path from my portal_resources object,
-# then do a traverse to it at validate time.
-
-
-class ScriptedValidator(SimpleFieldValidator):
-    """ SimpleFieldValidator that calls a Python Script
-        for simple validation.
-    """
-
-    def validate(self, value):
-        super(ScriptedValidator, self).validate(value)
-
-        validator_script = api.portal.get_tool(name='portal_resources').restrictedTraverse(self.validator_script_path)
-        result = validator_script(value)
-        if getattr(result, 'lower', None) is not None:
-            raise Invalid(result)
-
-
-def validatorClassFactory(dotted_path, scripted_validator_function):
-    """ return a validator class whose name is a validator_scripts key.
-    """
-
-    global validator_scripts
-    return type(
-        dotted_path,
-        (ScriptedValidator,),
-        dict(validator_script_path=scripted_validator_function)
-    )
-
-
-def defaultFunctionFactory(scripted_default_function):
-
-    @provider(IContextAwareDefaultFactory)
-    def default(context):
-        return scripted_default_function(context)
-
-    return default
-
-
-def vocabularyFunctionFactory(scripted_vocabulary_function):
-
-    @provider(IContextSourceBinder)
-    def vocabulary(context):
-        result = scripted_vocabulary_function(context)
-        if len(result) > 0:
-            if len(result[0]) == 1:
-                return SimpleVocabulary.fromValues(result)
-            elif len(result[0]) == 2:
-                return SimpleVocabulary.fromItems(result)
-            else:
-                raise ValueError(
-                    'Vocabulary scripts must return lists of values or items.'
-                )
-        return SimpleVocabulary([])
-
-    return vocabulary
-
-
-class DottedPathNode():
-    """ A node in a dotted path that may contain
-        other nodes, a default, a validator and/or a vocabulary.
-    """
-
-    def __init__(self, dotted_path):
-        self.dotted_path = dotted_path
-
-# global!
-resources = DottedPathNode('')
-
-# We're going to store references to validator script callables in
-# a dictionary that's indexed by the class name of the copy of
-# ScriptedValidator that we're saving at a dotted address.
-validator_scripts = {}
 
 
 class TestSetup(unittest.TestCase):
@@ -104,28 +23,43 @@ class TestSetup(unittest.TestCase):
         """Custom shared utility setup for tests."""
         self.portal = self.layer['portal']
 
-        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('validator_script')
-        script = self.portal.portal_resources.validator_script
-        script.ZBindings_edit([])
-        script.ZPythonScript_edit('value', 'if u"bad" in value.lower():\n  return u"value is bad: %s" % value')
+        pr = self.portal.portal_resources
 
-        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('string_default')
-        script = self.portal.portal_resources.string_default
-        # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        script.ZBindings_edit([])
-        script.ZPythonScript_edit('context', 'return u"default script %s" % context.title')
+        pr.manage_addFolder('ambidexterity')
+        pr.ambidexterity.manage_addFolder('simple_test_type')
+        pr.ambidexterity.simple_test_type.manage_addFolder('test_integer_field')
+        pr.ambidexterity.simple_test_type.manage_addFolder('test_string_field')
+        pr.ambidexterity.simple_test_type.manage_addFolder('test_choice_field')
 
-        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('integer_default')
-        script = self.portal.portal_resources.integer_default
-        # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        script.ZBindings_edit([])
-        script.ZPythonScript_edit('context', 'return 42')
+        field_folder = pr.ambidexterity.simple_test_type.test_string_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('validator')
+        string_validator_script = field_folder.validator
+        string_validator_script.ZBindings_edit([])
+        string_validator_script.ZPythonScript_edit(
+            'value',
+            'if u"bad" in value.lower():\n  return u"value is bad: %s" % value'
+        )
 
-        self.portal.portal_resources.manage_addProduct['PythonScripts'].manage_addPythonScript('test_vocabulary')
-        script = self.portal.portal_resources.test_vocabulary
+        field_folder = pr.ambidexterity.simple_test_type.test_string_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
+        string_default_script = field_folder.default
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        script.ZBindings_edit([])
-        script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
+        string_default_script.ZBindings_edit([])
+        string_default_script.ZPythonScript_edit('context', 'return u"default script %s" % context.title')
+
+        field_folder = pr.ambidexterity.simple_test_type.test_integer_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
+        integer_default_script = field_folder.default
+        # order important here. bindings must be cleared before we can set 'context' as a parameter.
+        integer_default_script.ZBindings_edit([])
+        integer_default_script.ZPythonScript_edit('context', 'return 42')
+
+        field_folder = pr.ambidexterity.simple_test_type.test_choice_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('vocabulary')
+        choice_vocabulary_script = field_folder.vocabulary
+        # order important here. bindings must be cleared before we can set 'context' as a parameter.
+        choice_vocabulary_script.ZBindings_edit([])
+        choice_vocabulary_script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
 
         global resources
         resources.simple_test_type = DottedPathNode('')
@@ -133,28 +67,23 @@ class TestSetup(unittest.TestCase):
         resources.simple_test_type.test_string_field = DottedPathNode('')
         resources.simple_test_type.test_choice_field = DottedPathNode('')
 
-        resources.simple_test_type.test_string_field.validator = validatorClassFactory(
+        resources.simple_test_type.test_string_field.validator = factories.validatorClassFactory(
             'ambidexterity.simple_test_type.test_string_field.validator',
-            'validator_script',
         )
-        resources.simple_test_type.test_integer_field.default = defaultFunctionFactory(
-            self.portal.portal_resources.integer_default
+        resources.simple_test_type.test_integer_field.default = factories.defaultFunctionFactory(
+            integer_default_script
         )
-        resources.simple_test_type.test_string_field.default = defaultFunctionFactory(
-            self.portal.portal_resources.string_default
+        resources.simple_test_type.test_string_field.default = factories.defaultFunctionFactory(
+            string_default_script
         )
-        resources.simple_test_type.test_choice_field.vocabulary = vocabularyFunctionFactory(
-            self.portal.portal_resources.test_vocabulary
+        resources.simple_test_type.test_choice_field.vocabulary = factories.vocabularyFunctionFactory(
+            choice_vocabulary_script
         )
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
 
-    def test_validator_script(self):
-        self.assertEqual(self.portal.portal_resources.validator_script('bad 42'), u"value is bad: bad 42")
-        self.assertEqual(self.portal.portal_resources.validator_script('good 42'), None)
-
-    def test_validator_via_item(self):
+    def test_validator(self):
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
         field = schema.get('test_string_field')
@@ -163,6 +92,7 @@ class TestSetup(unittest.TestCase):
         validator.validate(u'good input')
         with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
             validator.validate(u'bad input')
+        validator.validate(u'good input')
 
     def test_integer_default(self):
         test_item = createContent('simple_test_type', title=u'Test Item')
