@@ -19,6 +19,9 @@ TODO
 Build (and destroy) global name space as it's resolved (via dottedname_resolve)
 """
 
+# I probably need to store a path from my portal_resources object,
+# then do a traverse to it at validate time.
+
 
 class ScriptedValidator(SimpleFieldValidator):
     """ SimpleFieldValidator that calls a Python Script
@@ -28,7 +31,8 @@ class ScriptedValidator(SimpleFieldValidator):
     def validate(self, value):
         super(ScriptedValidator, self).validate(value)
 
-        result = validator_scripts[self.__class__.__name__](value)
+        validator_script = api.portal.get_tool(name='portal_resources').restrictedTraverse(self.validator_script_path)
+        result = validator_script(value)
         if getattr(result, 'lower', None) is not None:
             raise Invalid(result)
 
@@ -38,11 +42,10 @@ def validatorClassFactory(dotted_path, scripted_validator_function):
     """
 
     global validator_scripts
-    validator_scripts[dotted_path] = scripted_validator_function
     return type(
         dotted_path,
         (ScriptedValidator,),
-        {},
+        dict(validator_script_path=scripted_validator_function)
     )
 
 
@@ -132,7 +135,7 @@ class TestSetup(unittest.TestCase):
 
         resources.simple_test_type.test_string_field.validator = validatorClassFactory(
             'ambidexterity.simple_test_type.test_string_field.validator',
-            api.portal.get_tool(name='portal_resources').validator_script,
+            'validator_script',
         )
         resources.simple_test_type.test_integer_field.default = defaultFunctionFactory(
             self.portal.portal_resources.integer_default
