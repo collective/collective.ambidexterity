@@ -5,6 +5,7 @@ from collective.ambidexterity.resources import DottedPathNode
 from collective.ambidexterity import resources
 from collective.ambidexterity import factories
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
+from plone import api
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
 from zope.interface import Invalid
@@ -31,53 +32,71 @@ class TestSetup(unittest.TestCase):
         pr.ambidexterity.simple_test_type.manage_addFolder('test_string_field')
         pr.ambidexterity.simple_test_type.manage_addFolder('test_choice_field')
 
-        field_folder = pr.ambidexterity.simple_test_type.test_string_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('validator')
+        # field_folder = pr.ambidexterity.simple_test_type.test_string_field
+        from collective.ambidexterity import resources
+        resources.ofs_node = api.portal.get_tool(name='portal_resources').ambidexterity
+
+        field_folder = resources.simple_test_type.test_string_field.ofs_node
+        if field_folder.get('validator') is None:
+            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('validator')
         string_validator_script = field_folder.validator
+
         string_validator_script.ZBindings_edit([])
         string_validator_script.ZPythonScript_edit(
             'value',
             'if u"bad" in value.lower():\n  return u"value is bad: %s" % value'
         )
 
-        field_folder = pr.ambidexterity.simple_test_type.test_string_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
+        field_folder = resources.simple_test_type.test_string_field.ofs_node
+        if field_folder.get('default') is None:
+            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
         string_default_script = field_folder.default
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
         string_default_script.ZBindings_edit([])
         string_default_script.ZPythonScript_edit('context', 'return u"default script %s" % context.title')
 
-        field_folder = pr.ambidexterity.simple_test_type.test_integer_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
+        # field_folder = pr.ambidexterity.simple_test_type.test_integer_field
+        field_folder = resources.simple_test_type.test_integer_field.ofs_node
+        if field_folder.get('default') is None:
+            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
         integer_default_script = field_folder.default
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
         integer_default_script.ZBindings_edit([])
         integer_default_script.ZPythonScript_edit('context', 'return 42')
 
-        field_folder = pr.ambidexterity.simple_test_type.test_choice_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('vocabulary')
+        # field_folder = pr.ambidexterity.simple_test_type.test_choice_field
+        field_folder = resources.simple_test_type.test_choice_field.ofs_node
+        if field_folder.get('vocabulary') is None:
+            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('vocabulary')
         choice_vocabulary_script = field_folder.vocabulary
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
         choice_vocabulary_script.ZBindings_edit([])
         choice_vocabulary_script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
 
-        global resources
-        resources.simple_test_type = DottedPathNode('')
-        resources.simple_test_type.test_integer_field = DottedPathNode('')
-        resources.simple_test_type.test_string_field = DottedPathNode('')
-        resources.simple_test_type.test_choice_field = DottedPathNode('')
+        # resources.simple_test_type = DottedPathNode('')
+        # resources.simple_test_type.test_integer_field = DottedPathNode('')
+        # resources.simple_test_type.test_string_field = DottedPathNode('')
+        # resources.simple_test_type.test_choice_field = DottedPathNode('')
 
-        resources.simple_test_type.test_string_field.validator = factories.validatorClassFactory(
-            'ambidexterity.simple_test_type.test_string_field.validator',
+        setattr(
+            resources.simple_test_type.test_string_field,
+            'validator',
+            factories.validatorClassFactory('ambidexterity.simple_test_type.test_string_field.validator')
         )
-        resources.simple_test_type.test_integer_field.default = factories.defaultFunctionFactory(
-            integer_default_script
+        setattr(
+            resources.simple_test_type.test_integer_field,
+            'default',
+            factories.defaultFunctionFactory(integer_default_script)
         )
-        resources.simple_test_type.test_string_field.default = factories.defaultFunctionFactory(
-            string_default_script
+        setattr(
+            resources.simple_test_type.test_string_field,
+            'default',
+            factories.defaultFunctionFactory(string_default_script)
         )
-        resources.simple_test_type.test_choice_field.vocabulary = factories.vocabularyFunctionFactory(
-            choice_vocabulary_script
+        setattr(
+            resources.simple_test_type.test_choice_field,
+            'vocabulary',
+            factories.vocabularyFunctionFactory(choice_vocabulary_script)
         )
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
@@ -92,7 +111,6 @@ class TestSetup(unittest.TestCase):
         validator.validate(u'good input')
         with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
             validator.validate(u'bad input')
-        validator.validate(u'good input')
 
     def test_integer_default(self):
         test_item = createContent('simple_test_type', title=u'Test Item')
