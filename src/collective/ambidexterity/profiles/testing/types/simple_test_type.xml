@@ -32,23 +32,23 @@
       &lt;field name="test_integer_field" type="zope.schema.Int"&gt;
         &lt;description/&gt;
         &lt;required&gt;False&lt;/required&gt;
-        &lt;defaultFactory&gt;collective.ambidexterity.resources.simple_test_type.test_integer_field.default&lt;/defaultFactory&gt;
+        &lt;defaultFactory&gt;collective.ambidexterity.default&lt;/defaultFactory&gt;
         &lt;title&gt;Test Integer Field&lt;/title&gt;
       &lt;/field&gt;
       &lt;field name="test_string_field"
         type="zope.schema.TextLine"
-        form:validator="collective.ambidexterity.resources.simple_test_type.test_string_field.validator"
+        form:validator="collective.ambidexterity.validate"
       &gt;
         &lt;description/&gt;
         &lt;required&gt;False&lt;/required&gt;
-        &lt;defaultFactory&gt;collective.ambidexterity.resources.simple_test_type.test_string_field.default&lt;/defaultFactory&gt;
+        &lt;defaultFactory&gt;collective.ambidexterity.default&lt;/defaultFactory&gt;
         &lt;title&gt;Test String Field&lt;/title&gt;
       &lt;/field&gt;
       &lt;field name="test_choice_field" type="zope.schema.Choice"&gt;
         &lt;description/&gt;
         &lt;required&gt;False&lt;/required&gt;
         &lt;title&gt;Test Choice Field&lt;/title&gt;
-        &lt;source&gt;collective.ambidexterity.resources.simple_test_type.test_choice_field.vocabulary&lt;/source&gt;
+        &lt;source&gt;collective.ambidexterity.vocabulary&lt;/source&gt;
       &lt;/field&gt;
     &lt;/schema&gt;
   &lt;/model&gt;</property>

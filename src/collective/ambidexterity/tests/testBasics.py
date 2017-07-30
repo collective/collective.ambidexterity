@@ -4,6 +4,7 @@
 from collective.ambidexterity.resources import DottedPathNode
 from collective.ambidexterity import resources
 from collective.ambidexterity import factories
+from collective.ambidexterity import Validator
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
 from plone import api
 from plone.app.testing import applyProfile
@@ -32,72 +33,35 @@ class TestSetup(unittest.TestCase):
         pr.ambidexterity.simple_test_type.manage_addFolder('test_string_field')
         pr.ambidexterity.simple_test_type.manage_addFolder('test_choice_field')
 
-        # field_folder = pr.ambidexterity.simple_test_type.test_string_field
-        from collective.ambidexterity import resources
-        resources.ofs_node = api.portal.get_tool(name='portal_resources').ambidexterity
-
-        field_folder = resources.simple_test_type.test_string_field.ofs_node
-        if field_folder.get('validator') is None:
-            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('validator')
-        string_validator_script = field_folder.validator
-
+        field_folder = pr.ambidexterity.simple_test_type.test_string_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('validate')
+        string_validator_script = field_folder.validate
         string_validator_script.ZBindings_edit([])
         string_validator_script.ZPythonScript_edit(
-            'value',
+            'value, context=None',
             'if u"bad" in value.lower():\n  return u"value is bad: %s" % value'
         )
 
-        field_folder = resources.simple_test_type.test_string_field.ofs_node
-        if field_folder.get('default') is None:
-            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
+        field_folder = pr.ambidexterity.simple_test_type.test_string_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
         string_default_script = field_folder.default
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
         string_default_script.ZBindings_edit([])
         string_default_script.ZPythonScript_edit('context', 'return u"default script %s" % context.title')
 
-        # field_folder = pr.ambidexterity.simple_test_type.test_integer_field
-        field_folder = resources.simple_test_type.test_integer_field.ofs_node
-        if field_folder.get('default') is None:
-            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
+        field_folder = pr.ambidexterity.simple_test_type.test_integer_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
         integer_default_script = field_folder.default
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
         integer_default_script.ZBindings_edit([])
         integer_default_script.ZPythonScript_edit('context', 'return 42')
 
-        # field_folder = pr.ambidexterity.simple_test_type.test_choice_field
-        field_folder = resources.simple_test_type.test_choice_field.ofs_node
-        if field_folder.get('vocabulary') is None:
-            field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('vocabulary')
+        field_folder = pr.ambidexterity.simple_test_type.test_choice_field
+        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('vocabulary')
         choice_vocabulary_script = field_folder.vocabulary
         # order important here. bindings must be cleared before we can set 'context' as a parameter.
         choice_vocabulary_script.ZBindings_edit([])
         choice_vocabulary_script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
-
-        # resources.simple_test_type = DottedPathNode('')
-        # resources.simple_test_type.test_integer_field = DottedPathNode('')
-        # resources.simple_test_type.test_string_field = DottedPathNode('')
-        # resources.simple_test_type.test_choice_field = DottedPathNode('')
-
-        setattr(
-            resources.simple_test_type.test_string_field,
-            'validator',
-            factories.validatorClassFactory('ambidexterity.simple_test_type.test_string_field.validator')
-        )
-        setattr(
-            resources.simple_test_type.test_integer_field,
-            'default',
-            factories.defaultFunctionFactory(integer_default_script)
-        )
-        setattr(
-            resources.simple_test_type.test_string_field,
-            'default',
-            factories.defaultFunctionFactory(string_default_script)
-        )
-        setattr(
-            resources.simple_test_type.test_choice_field,
-            'vocabulary',
-            factories.vocabularyFunctionFactory(choice_vocabulary_script)
-        )
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
@@ -106,8 +70,7 @@ class TestSetup(unittest.TestCase):
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
         field = schema.get('test_string_field')
-        validator_class = resources.simple_test_type.test_string_field.validator
-        validator = validator_class(None, None, None, field, None)
+        validator = Validator(None, None, None, field, None)
         validator.validate(u'good input')
         with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
             validator.validate(u'bad input')
@@ -121,12 +84,18 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(test_item.test_string_field, u'default script The Meaning of Life')
 
     def test_vocabulary(self):
+
+        def callWithFieldAsSelf(field, context):
+            self = field
+            return self.source(context)
+
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
+        # make field an attribute of self so that vocabulary function can find it.
         field = schema.get('test_choice_field')
-        source = field.source
-        self.assertEqual(type(source(self)), type(SimpleVocabulary.fromItems([])))
-        self.assertEqual([s.value for s in source(self)], [u'a', u'b', u'c'])
+        vocab = callWithFieldAsSelf(field, None)
+        self.assertEqual(type(vocab), type(SimpleVocabulary.fromItems([])))
+        self.assertEqual([s.value for s in vocab], [u'a', u'b', u'c'])
 
 """
 notes
