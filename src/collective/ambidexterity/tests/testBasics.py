@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 """Idea tests for this package."""
 
-from collective.ambidexterity.resources import DottedPathNode
-from collective.ambidexterity import resources
-from collective.ambidexterity import factories
 from collective.ambidexterity import Validator
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
 from plone import api

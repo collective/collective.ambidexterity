@@ -8,9 +8,6 @@
 
   <includeDependencies package="." />
 
-  <include package=".browser" />
-
-
   <genericsetup:registerProfile
       name="default"
       title="collective.ambidexterity"
