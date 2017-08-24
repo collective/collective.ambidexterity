@@ -41,7 +41,6 @@ for the Dexterity type "my_simple_type" and we would get::
 
 automatically called as appropriate.
 
-
 Contribute
 ----------
 

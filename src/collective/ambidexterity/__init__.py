@@ -23,6 +23,7 @@ from zope.i18nmessageid import MessageFactory
 from zope.interface import Invalid
 from zope.interface import provider
 from z3c.form.validator import SimpleFieldValidator
+from zope.untrustedpython.interpreter import CompiledProgram
 
 import inspect
 import re
@@ -44,7 +45,7 @@ def getAmbidexterityScript(ctype_name, field_name, id):
     pr = api.portal.get_tool(name='portal_resources')
     path = '/'.join(('ambidexterity', demunge(ctype_name), field_name, id))
     # TODO: give a meaningful message if we can't find the script
-    return pr.restrictedTraverse(path)
+    return pr.restrictedTraverse(path).data
 
 
 @provider(IContextAwareDefaultFactory)
@@ -56,8 +57,11 @@ def default(context):
     field = getFrameLocal(stack, 1, 'inst')
     field_name = field.getName()
     ctype_name = field.interface.getName()
-    script = getAmbidexterityScript(ctype_name, field_name, 'default')
-    return script(context)
+    script = getAmbidexterityScript(ctype_name, field_name, 'default.py')
+    cp = CompiledProgram(script)
+    cp_globals = dict(context=context)
+    cp.exec_(cp_globals)
+    return cp_globals['default']
 
 
 @provider(IContextSourceBinder)
@@ -68,8 +72,11 @@ def vocabulary(context):
     field = getFrameLocal(stack, 1, 'self')
     field_name = field.getName()
     ctype_name = field.interface.getName()
-    script = getAmbidexterityScript(ctype_name, field_name, 'vocabulary')
-    result = script(context)
+    script = getAmbidexterityScript(ctype_name, field_name, 'vocabulary.py')
+    cp = CompiledProgram(script)
+    cp_globals = dict(context=context)
+    cp.exec_(cp_globals)
+    result = cp_globals['vocabulary']
     if len(result) > 0:
         if len(result[0]) == 1:
             return SimpleVocabulary.fromValues(result)
@@ -88,11 +95,12 @@ class Validator(SimpleFieldValidator):
         field = self.field
         field_name = field.getName()
         ctype_name = field.interface.getName()
-        script = getAmbidexterityScript(ctype_name, field_name, 'validate')
-        result = script(value, self.context)
-        # Does the result look like a string?
-        # If so, raise Invalid using it as a message.
-        if getattr(result, 'lower', None) is not None:
+        script = getAmbidexterityScript(ctype_name, field_name, 'validate.py')
+        cp = CompiledProgram(script)
+        cp_globals = dict(value=value, context=self.context)
+        cp.exec_(cp_globals)
+        result = cp_globals.get('error_message')
+        if result is not None:
             raise Invalid(result)
 
 # Alias the Validator class to validate so that we can find it at

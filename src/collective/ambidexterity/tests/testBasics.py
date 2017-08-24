@@ -3,7 +3,6 @@
 
 from collective.ambidexterity import Validator
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
-from plone import api
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
 from zope.interface import Invalid
@@ -31,34 +30,24 @@ class TestSetup(unittest.TestCase):
         pr.ambidexterity.simple_test_type.manage_addFolder('test_choice_field')
 
         field_folder = pr.ambidexterity.simple_test_type.test_string_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('validate')
-        string_validator_script = field_folder.validate
-        string_validator_script.ZBindings_edit([])
-        string_validator_script.ZPythonScript_edit(
-            'value, context=None',
-            'if u"bad" in value.lower():\n  return u"value is bad: %s" % value'
+        field_folder.manage_addFile('validate.py')
+        field_folder['validate.py'].update_data(
+            'if u"bad" in value.lower():\n  error_message = u"At %s, value is bad: %s" % (context.getId(), value)'
         )
 
         field_folder = pr.ambidexterity.simple_test_type.test_string_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
-        string_default_script = field_folder.default
-        # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        string_default_script.ZBindings_edit([])
-        string_default_script.ZPythonScript_edit('context', 'return u"default script %s" % context.title')
+        field_folder.manage_addFile('default.py')
+        field_folder['default.py'].update_data('default = u"default script %s" % context.title')
 
         field_folder = pr.ambidexterity.simple_test_type.test_integer_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('default')
-        integer_default_script = field_folder.default
-        # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        integer_default_script.ZBindings_edit([])
-        integer_default_script.ZPythonScript_edit('context', 'return 42')
+        field_folder.manage_addFile('default.py')
+        integer_default_script = field_folder['default.py']
+        integer_default_script.update_data('default = 42')
 
         field_folder = pr.ambidexterity.simple_test_type.test_choice_field
-        field_folder.manage_addProduct['PythonScripts'].manage_addPythonScript('vocabulary')
-        choice_vocabulary_script = field_folder.vocabulary
-        # order important here. bindings must be cleared before we can set 'context' as a parameter.
-        choice_vocabulary_script.ZBindings_edit([])
-        choice_vocabulary_script.ZPythonScript_edit('context', "return [(1, u'a'), (2, u'b'), (3, u'c')]")
+        field_folder.manage_addFile('vocabulary.py')
+        choice_vocabulary_script = field_folder['vocabulary.py']
+        choice_vocabulary_script.update_data("vocabulary = [(1, u'a'), (2, u'b'), (3, u'c')]")
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
@@ -67,10 +56,11 @@ class TestSetup(unittest.TestCase):
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
         field = schema.get('test_string_field')
-        validator = Validator(None, None, None, field, None)
+        validator = Validator(self.portal, None, None, field, None)
         validator.validate(u'good input')
-        with self.assertRaisesRegexp(Invalid, 'value is bad: bad input'):
+        with self.assertRaises(Invalid) as cm:
             validator.validate(u'bad input')
+        self.assertEqual(cm.exception.message, u'At plone, value is bad: bad input')
 
     def test_integer_default(self):
         test_item = createContent('simple_test_type', title=u'Test Item')
