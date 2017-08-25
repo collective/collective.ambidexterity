@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-""" Make is possible to called Dexterity validator, vocabulary,
+""" Make it possible to call Dexterity validator, vocabulary,
     and default functions as Python Scripts kept in
     portal_resources/ambidexterity/content_type_name/field_name/(default|vocabulary|validate).
 
@@ -24,6 +24,7 @@ from zope.interface import Invalid
 from zope.interface import provider
 from z3c.form.validator import SimpleFieldValidator
 from zope.untrustedpython.interpreter import CompiledProgram
+import StringIO
 
 import inspect
 import re
@@ -97,10 +98,15 @@ class Validator(SimpleFieldValidator):
         ctype_name = field.interface.getName()
         script = getAmbidexterityScript(ctype_name, field_name, 'validate.py')
         cp = CompiledProgram(script)
-        cp_globals = dict(value=value, context=self.context)
+        printed = StringIO.StringIO()
+        cp_globals = dict(value=value, context=self.context, untrusted_output=printed)
         cp.exec_(cp_globals)
         result = cp_globals.get('error_message')
         if result is not None:
+            raise Invalid(result)
+        printed.seek(0)
+        result = printed.read().strip()
+        if len(result) > 0:
             raise Invalid(result)
 
 # Alias the Validator class to validate so that we can find it at
