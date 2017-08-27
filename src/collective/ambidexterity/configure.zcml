@@ -44,12 +44,4 @@
       factory=".setuphandlers.HiddenProfiles"
       name="collective.ambidexterity-hiddenprofiles" />
 
-  <!-- Resource traverser -->
-  <adapter
-      name="ambidexterity"
-      for="* zope.publisher.interfaces.IRequest"
-      provides="zope.traversing.interfaces.ITraversable"
-      factory=".traversal.AmbidexterityTraverser"
-      />
-
 </configure>
