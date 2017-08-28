@@ -34,12 +34,55 @@ The general idea is that we will be able to use Dexterity XML to specify a schem
 
 for the Dexterity type "my_simple_type" and we would get::
 
-    portal_resources/ambidexterity/my_simple_type/test_integer_field/default
-    portal_resources/ambidexterity/my_simple_type/test_string_field/default
-    portal_resources/ambidexterity/my_simple_type/test_string_field/validate
-    portal_resources/ambidexterity/my_simple_type/test_choice_field/vocabulary
+    portal_resources/ambidexterity/my_simple_type/test_integer_field/default.py
+    portal_resources/ambidexterity/my_simple_type/test_string_field/default.py
+    portal_resources/ambidexterity/my_simple_type/test_string_field/validate.py
+    portal_resources/ambidexterity/my_simple_type/test_choice_field/vocabulary.py
 
 automatically called as appropriate.
+
+The scripts from portal_resources/ambidexterity are executed as untrusted Python.
+
+Defaults
+--------
+
+The script is given one value (other than standard builtins):
+"context" -- which is either the creation folder if the item is being
+added or the item if being edited.
+
+The vocabulary should be assigned to "default" in the script
+and should be of the type required by the field.
+
+Vocabularies
+------------
+
+The script is given one value (other than standard builtins):
+"context" -- which is either the creation folder if the item is being
+added or the item if being edited.
+
+The vocabulary should be assigned to "vocabulary" in the script.
+It should be a list of values or a list of items (value, title).
+
+Validators
+----------
+
+The script is given two values (other than standard builtins):
+
+    * "context" -- which is either the creation folder if the item is being
+      added or the item if being edited.
+
+    * "value" -- the field value submitted for validation.
+
+If the validator script determines the value is invalid, it should do
+one of the following:
+
+    * print an error message using Python's "print"; or,
+
+    * assign an error message to a variable named "error_message".
+
+If the value is valid, do not do either of the above.
+The absence of an error message is taken to mean all is OK.
+
 
 Contribute
 ----------
