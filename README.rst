@@ -32,7 +32,7 @@ The general idea is that we will be able to use Dexterity XML to specify a schem
       </field>
     </schema>
 
-for the Dexterity type "my_simple_type" and we would get::
+For the Dexterity type "my_simple_type" and we would get::
 
     portal_resources/ambidexterity/my_simple_type/test_integer_field/default.py
     portal_resources/ambidexterity/my_simple_type/test_string_field/default.py
