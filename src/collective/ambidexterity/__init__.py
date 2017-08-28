@@ -15,95 +15,17 @@
     dotted path "collective.ambidexterity.default".
 """
 
-from interpreter import AmbidexterityProgram
-from plone import api
-from z3c.form.validator import SimpleFieldValidator
 from zope.i18nmessageid import MessageFactory
-from zope.interface import Invalid
-from zope.interface import provider
-from zope.schema.interfaces import IContextAwareDefaultFactory
-from zope.schema.interfaces import IContextSourceBinder
-from zope.schema.vocabulary import SimpleVocabulary
-
-import StringIO
-import inspect
-import re
 
 _ = MessageFactory('collective.ambidexterity')
 
-plone_munge = re.compile(r"""plone_\d+_""", flags=re.IGNORECASE)
 
+# Things we want visible at collective.ambidexterity
 
-def demunge(s):
-    return plone_munge.sub('', s)
+from default import default  # NOQA
+from vocabulary import vocabulary  # NOQA
+from validator import Validator  # NOQA
 
-
-def getFrameLocal(stack, level, name):
-    return stack[level][0].f_locals[name]
-
-
-def getAmbidexterityScript(ctype_name, field_name, id):
-    pr = api.portal.get_tool(name='portal_resources')
-    path = '/'.join(('ambidexterity', demunge(ctype_name), field_name, id))
-    # TODO: give a meaningful message if we can't find the script
-    return pr.restrictedTraverse(path).data
-
-
-@provider(IContextAwareDefaultFactory)
-def default(context):
-    # we expect this to be called from a function that
-    # has a local variable named "inst" that is the field.
-
-    stack = inspect.stack()
-    field = getFrameLocal(stack, 1, 'inst')
-    field_name = field.getName()
-    ctype_name = field.interface.getName()
-    script = getAmbidexterityScript(ctype_name, field_name, 'default.py')
-    cp = AmbidexterityProgram(script)
-    return cp.execute(dict(context=context))['default']
-
-
-@provider(IContextSourceBinder)
-def vocabulary(context):
-    # we expect this to be called as a method on a field.
-
-    stack = inspect.stack()
-    field = getFrameLocal(stack, 1, 'self')
-    field_name = field.getName()
-    ctype_name = field.interface.getName()
-    script = getAmbidexterityScript(ctype_name, field_name, 'vocabulary.py')
-    cp = AmbidexterityProgram(script)
-    cp_globals = dict(context=context)
-    result = cp.execute(cp_globals)['vocabulary']
-    if len(result) > 0:
-        if len(result[0]) == 1:
-            return SimpleVocabulary.fromValues(result)
-        elif len(result[0]) == 2:
-            return SimpleVocabulary.fromItems(result)
-        else:
-            raise ValueError(
-                'Vocabulary scripts must return lists of values or items.'
-            )
-    return SimpleVocabulary([])
-
-
-class Validator(SimpleFieldValidator):
-    def validate(self, value):
-        super(Validator, self).validate(value)
-        field = self.field
-        field_name = field.getName()
-        ctype_name = field.interface.getName()
-        script = getAmbidexterityScript(ctype_name, field_name, 'validate.py')
-        cp = AmbidexterityProgram(script)
-        printed = StringIO.StringIO()
-        cp_globals = dict(value=value, context=self.context, untrusted_output=printed)
-        result = cp.execute(cp_globals).get('error_message')
-        if result is not None:
-            raise Invalid(result)
-        printed.seek(0)
-        result = printed.read().strip()
-        if len(result) > 0:
-            raise Invalid(result)
 
 # Alias the Validator class to validate so that we can find it at
 # collective.ambidexterity.validate

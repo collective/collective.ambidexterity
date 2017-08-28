@@ -7,7 +7,6 @@ from zope.security.checker import defineChecker
 from zope.security.checker import NamesChecker
 from zope.security.checker import DuplicationError
 from zope.untrustedpython.interpreter import CompiledProgram
-from zope.security.checker import _checkers as zsc  # for debugging
 
 import datetime
 import random
@@ -29,6 +28,7 @@ def declareSafe(atype):
 # perhaps some other module is clearing them if it's initialized
 # after this.
 initialized = False
+
 
 def init():
     global initialized
@@ -55,5 +55,4 @@ class AmbidexterityProgram(CompiledProgram):
         if locals is None:
             locals = {}
         self.exec_(my_globals, locals=locals, output=output)
-        returned = {}
         return locals
