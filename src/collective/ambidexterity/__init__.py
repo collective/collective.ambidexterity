@@ -15,17 +15,17 @@
     dotted path "collective.ambidexterity.default".
 """
 
+from interpreter import AmbidexterityProgram
 from plone import api
-from zope.schema.interfaces import IContextAwareDefaultFactory
-from zope.schema.interfaces import IContextSourceBinder
-from zope.schema.vocabulary import SimpleVocabulary
+from z3c.form.validator import SimpleFieldValidator
 from zope.i18nmessageid import MessageFactory
 from zope.interface import Invalid
 from zope.interface import provider
-from z3c.form.validator import SimpleFieldValidator
-from zope.untrustedpython.interpreter import CompiledProgram
-import StringIO
+from zope.schema.interfaces import IContextAwareDefaultFactory
+from zope.schema.interfaces import IContextSourceBinder
+from zope.schema.vocabulary import SimpleVocabulary
 
+import StringIO
 import inspect
 import re
 
@@ -59,10 +59,8 @@ def default(context):
     field_name = field.getName()
     ctype_name = field.interface.getName()
     script = getAmbidexterityScript(ctype_name, field_name, 'default.py')
-    cp = CompiledProgram(script)
-    cp_globals = dict(context=context)
-    cp.exec_(cp_globals)
-    return cp_globals['default']
+    cp = AmbidexterityProgram(script)
+    return cp.execute(dict(context=context))['default']
 
 
 @provider(IContextSourceBinder)
@@ -74,10 +72,9 @@ def vocabulary(context):
     field_name = field.getName()
     ctype_name = field.interface.getName()
     script = getAmbidexterityScript(ctype_name, field_name, 'vocabulary.py')
-    cp = CompiledProgram(script)
+    cp = AmbidexterityProgram(script)
     cp_globals = dict(context=context)
-    cp.exec_(cp_globals)
-    result = cp_globals['vocabulary']
+    result = cp.execute(cp_globals)['vocabulary']
     if len(result) > 0:
         if len(result[0]) == 1:
             return SimpleVocabulary.fromValues(result)
@@ -97,11 +94,10 @@ class Validator(SimpleFieldValidator):
         field_name = field.getName()
         ctype_name = field.interface.getName()
         script = getAmbidexterityScript(ctype_name, field_name, 'validate.py')
-        cp = CompiledProgram(script)
+        cp = AmbidexterityProgram(script)
         printed = StringIO.StringIO()
         cp_globals = dict(value=value, context=self.context, untrusted_output=printed)
-        cp.exec_(cp_globals)
-        result = cp_globals.get('error_message')
+        result = cp.execute(cp_globals).get('error_message')
         if result is not None:
             raise Invalid(result)
         printed.seek(0)
