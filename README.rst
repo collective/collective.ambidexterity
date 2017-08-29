@@ -2,7 +2,7 @@
 collective.ambidexterity
 ==============================================================================
 
-This is currently a set of explorations of the idea of doing Dexterity validators, vocabularies and defaults TTW via scripts in portal_resources.
+This is currently a set of explorations of the idea of doing Dexterity views, validators, vocabularies and defaults TTW via scripts in portal_resources.
 It's at proof-of-concept stage.
 If it works, we can build a plone.app.theming style UI to edit the portal_resources/ambidexterity space.
 
@@ -83,6 +83,10 @@ one of the following:
 If the value is valid, do not do either of the above.
 The absence of an error message is taken to mean all is OK.
 
+Views
+-----
+
+If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type as a text file, it will be usable at @@ambidexterityview.
 
 Contribute
 ----------

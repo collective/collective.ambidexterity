@@ -1,11 +1,13 @@
+# -*- coding: utf-8 -*-
+""" If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type
+    as a text file, it will be reachable at @@ambidexterityview.
+"""
 
-from Acquisition import aq_inner
+
 from plone import api
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
-# from Products.Five.browser.pagetemplatefile import sniff_type
-# from Products.Five.browser.pagetemplatefile import XML_PREFIX_MAX_LENGTH
 
 
 class ViewPageTemplateResource(ViewPageTemplateFile):
