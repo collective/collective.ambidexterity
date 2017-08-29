@@ -29,6 +29,12 @@ class TestSetup(unittest.TestCase):
         pr.ambidexterity.simple_test_type.manage_addFolder('test_string_field')
         pr.ambidexterity.simple_test_type.manage_addFolder('test_choice_field')
 
+        type_folder = pr.ambidexterity.simple_test_type
+        type_folder.manage_addFile('view.pt')
+        type_folder['view.pt'].update_data(
+            'view.pt for <span tal:replace="context/id" />'
+        )
+
         field_folder = pr.ambidexterity.simple_test_type.test_string_field
         field_folder.manage_addFile('validate.py')
         field_folder['validate.py'].update_data(
@@ -84,18 +90,9 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(type(vocab), type(SimpleVocabulary.fromItems([])))
         self.assertEqual([s.value for s in vocab], [u'a', u'b', u'c'])
 
-"""
-notes
-
-fti = portal_types.typename
-schema = fti.lookupSchema()
-schema.validateInvariants(something)
-field = schema.get('test_string_field')
-field.validate(something)
-
-schema.get('test_integer_field').validate('five')
-WrongType: ('five', (<type 'int'>, <type 'long'>), 'test_integer_field')
-
-schema.get('test_integer_field').validate(5)
-None
-"""
+    def test_view_default(self):
+        test_item = createContent('simple_test_type', title=u'The Meaning of Life')
+        test_item.id = 'test_item'
+        self.portal['test_item'] = test_item
+        view = self.portal['test_item'].restrictedTraverse('@@ambidexterityview')
+        self.assertEqual(view(), u'view.pt for test_item')

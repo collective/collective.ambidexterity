@@ -1,0 +1,1 @@
+AMBIDEXTERITY VIEW PLACEHOLDER for <span tal:replace="context/id" />

@@ -1,8 +1,10 @@
 <configure
     xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
     xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
     xmlns:i18n="http://namespaces.zope.org/i18n"
-    i18n_domain="collective.ambidexterity">
+    i18n_domain="collective.ambidexterity"
+    >
 
   <i18n:registerTranslations directory="locales" />
 
@@ -43,5 +45,21 @@
   <utility
       factory=".setuphandlers.HiddenProfiles"
       name="collective.ambidexterity-hiddenprofiles" />
+
+  <browser:page
+      name="ambidexterityview"
+      for="plone.dexterity.interfaces.IDexterityContainer"
+      class="collective.ambidexterity.view.AmbidexterityView"
+      template="view.pt"
+      permission="zope2.View"
+      />
+
+  <browser:page
+      name="ambidexterityview"
+      for="plone.dexterity.interfaces.IDexterityItem"
+      class="collective.ambidexterity.view.AmbidexterityView"
+      template="view.pt"
+      permission="zope2.View"
+      />
 
 </configure>
