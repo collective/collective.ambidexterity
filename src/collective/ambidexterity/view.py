@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 """ If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type
     as a text file, it will be usable at @@ambidexterityview.
+
+    TODO: see if we can use browser:page to allow different view templates with view.pt as default.
+    Get content type from text object when possible? Rather than sniffing?
 """
 
 
@@ -25,7 +28,6 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
     def _read_file(self):
         # zope.pagetemplate.pagetemplatefile equivalent, but fetches text
         # from portal_resources.
-        # TODO: give a meaningful message if we can't find the script
 
         pr = api.portal.get_tool(name='portal_resources')
         __traceback_info__ = self.filename  # NOQA

@@ -95,8 +95,7 @@ class TestSetup(unittest.TestCase):
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         test_item.id = 'test_item'
         self.portal['test_item'] = test_item
-        view = self.portal['test_item'].restrictedTraverse('@@ambidexterityview')
-        self.assertEqual(view(), u'view.pt for test_item')
+        self.assertEqual(self.portal['test_item'](), u'view.pt for test_item')
         # but not when there's no such resource
         test_item = createContent('Folder', title=u'A Folder')
         test_item.id = 'afolder'
