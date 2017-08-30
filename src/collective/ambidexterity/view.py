@@ -1,9 +1,13 @@
 # -*- coding: utf-8 -*-
-""" If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type
+"""
+    If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type
     as a text file, it will be usable at @@ambidexterityview.
 
-    TODO: see if we can use browser:page to allow different view templates with view.pt as default.
-    Get content type from text object when possible? Rather than sniffing?
+    You may also set other template files and traverse to them at URLs like @@ambidexterityview/custom_file.js.
+
+    TODO:
+        * make sure security is still working after my minor intervention
+          in traversal.
 """
 
 
@@ -17,11 +21,11 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
     """ Fetch template from a resource rather than a file.
     """
 
-    def __init__(self, portal_type, _prefix=None, content_type=None):
+    def __init__(self, portal_type, template_name="view.pt", _prefix=None, content_type=None):
         _prefix = self.get_path_from_prefix(_prefix)
         # ViewPageTemplateFile.__init__() does some file checking we wish to skip.
         # super(ViewPageTemplateFile, self).__init__(filename, _prefix)
-        self.filename = '/'.join(('ambidexterity', portal_type, 'view.pt'))
+        self.filename = '/'.join(('ambidexterity', portal_type, template_name))
         if content_type is not None:
             self.content_type = content_type
 
@@ -32,13 +36,14 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
         pr = api.portal.get_tool(name='portal_resources')
         __traceback_info__ = self.filename  # NOQA
         try:
-            body = pr.restrictedTraverse(self.filename).data
+            resource = pr.restrictedTraverse(self.filename)
         except KeyError:
             raise KeyError(u"Ambidexterity view not implemented")
-        type_ = sniff_type(body)
-        if type_ != "text/xml":
-            body, type_ = self._prepare_html(body)
-        return body, type_
+        body = resource.data
+        content_type = resource.content_type
+        if content_type == 'text/x-unknown-content-type' and self.filename.endswith('.pt'):
+            content_type = 'text/html'
+        return body, content_type
 
 
 class AmbidexterityView(BrowserView):
@@ -47,28 +52,13 @@ class AmbidexterityView(BrowserView):
     """
 
     def __call__(self):
-        vptr = ViewPageTemplateResource(self.context.portal_type)
+        vptr = ViewPageTemplateResource(
+            self.context.portal_type,
+            template_name=getattr(self, 'section', 'view.pt')
+        )
         bpt = BoundPageTemplate(vptr, self)
         return bpt()
 
-
-# from zope.pagetemplate.pagetemplatefile:
-
-XML_PREFIXES = [
-    "<?xml",                      # ascii, utf-8
-    "\xef\xbb\xbf<?xml",          # utf-8 w/ byte order mark
-    "\0<\0?\0x\0m\0l",            # utf-16 big endian
-    "<\0?\0x\0m\0l\0",            # utf-16 little endian
-    "\xfe\xff\0<\0?\0x\0m\0l",    # utf-16 big endian w/ byte order mark
-    "\xff\xfe<\0?\0x\0m\0l\0",    # utf-16 little endian w/ byte order mark
-]
-
-XML_PREFIX_MAX_LENGTH = max(map(len, XML_PREFIXES))
-
-
-def sniff_type(text):
-    """Return 'text/xml' if text appears to be XML, otherwise return None."""
-    for prefix in XML_PREFIXES:
-        if text.startswith(prefix):
-            return "text/xml"
-    return None
+    def __getitem__(self, name):
+        self.section = name
+        return self

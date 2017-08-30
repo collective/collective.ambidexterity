@@ -34,6 +34,10 @@ class TestSetup(unittest.TestCase):
         type_folder['view.pt'].update_data(
             'view.pt for <span tal:replace="context/id" />'
         )
+        type_folder.manage_addFile('custom.js')
+        type_folder['custom.js'].update_data(
+            'custom.js for <span tal:replace="context/id" />'
+        )
 
         field_folder = pr.ambidexterity.simple_test_type.test_string_field
         field_folder.manage_addFile('validate.py')
@@ -90,12 +94,20 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(type(vocab), type(SimpleVocabulary.fromItems([])))
         self.assertEqual([s.value for s in vocab], [u'a', u'b', u'c'])
 
-    def test_view_default(self):
-        # make sure we're returning the ambidexterity view when implemented
+    def test_views(self):
+        # make sure we're returning the ambidexterity view when implemented.
+        # First, create an item that we can traverse.
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         test_item.id = 'test_item'
         self.portal['test_item'] = test_item
-        self.assertEqual(self.portal['test_item'](), u'view.pt for test_item')
+        test_item = self.portal['test_item']
+        # Now, try the default view
+        self.assertEqual(self.portal.test_item(), u'view.pt for test_item')
+        # Then a custom view
+        self.assertEqual(
+            self.portal.test_item.restrictedTraverse("@@ambidexterityview/custom.js")(),
+            u'custom.js for test_item'
+        )
         # but not when there's no such resource
         test_item = createContent('Folder', title=u'A Folder')
         test_item.id = 'afolder'
