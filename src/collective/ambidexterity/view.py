@@ -23,29 +23,17 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
             self.content_type = content_type
 
     def _read_file(self):
-        pr = api.portal.get_tool(name='portal_resources')
+        # zope.pagetemplate.pagetemplatefile equivalent, but fetches text
+        # from portal_resources.
         # TODO: give a meaningful message if we can't find the script
-        __traceback_info__ = self.filename
-        body = pr.restrictedTraverse(filename).data
-        return body, 'test/html'
-        # __traceback_info__ = self.filename
-        # f = open(self.filename, "rb")
-        # try:
-        #     text = f.read(XML_PREFIX_MAX_LENGTH)
-        # except:
-        #     f.close()
-        #     raise
-        # type_ = sniff_type(text)
-        # if type_ == "text/xml":
-        #     text += f.read()
-        # else:
-        #     # For HTML, we really want the file read in text mode:
-        #     f.close()
-        #     f = open(self.filename)
-        #     text = f.read()
-        #     text, type_ = self._prepare_html(text)
-        # f.close()
-        # return text, type_
+
+        pr = api.portal.get_tool(name='portal_resources')
+        __traceback_info__ = self.filename  # NOQA
+        body = pr.restrictedTraverse(self.filename).data
+        type_ = sniff_type(body)
+        if type_ != "text/xml":
+            body, type_ = self._prepare_html(body)
+        return body, type_
 
 
 class AmbidexterityView(BrowserView):
@@ -57,3 +45,25 @@ class AmbidexterityView(BrowserView):
         vptr = ViewPageTemplateResource('simple_test_type')
         bpt = BoundPageTemplate(vptr, self)
         return bpt()
+
+
+# from zope.pagetemplate.pagetemplatefile:
+
+XML_PREFIXES = [
+    "<?xml",                      # ascii, utf-8
+    "\xef\xbb\xbf<?xml",          # utf-8 w/ byte order mark
+    "\0<\0?\0x\0m\0l",            # utf-16 big endian
+    "<\0?\0x\0m\0l\0",            # utf-16 little endian
+    "\xfe\xff\0<\0?\0x\0m\0l",    # utf-16 big endian w/ byte order mark
+    "\xff\xfe<\0?\0x\0m\0l\0",    # utf-16 little endian w/ byte order mark
+]
+
+XML_PREFIX_MAX_LENGTH = max(map(len, XML_PREFIXES))
+
+
+def sniff_type(text):
+    """Return 'text/xml' if text appears to be XML, otherwise return None."""
+    for prefix in XML_PREFIXES:
+        if text.startswith(prefix):
+            return "text/xml"
+    return None
