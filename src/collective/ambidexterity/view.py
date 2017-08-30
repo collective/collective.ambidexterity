@@ -29,7 +29,10 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
 
         pr = api.portal.get_tool(name='portal_resources')
         __traceback_info__ = self.filename  # NOQA
-        body = pr.restrictedTraverse(self.filename).data
+        try:
+            body = pr.restrictedTraverse(self.filename).data
+        except KeyError:
+            raise KeyError(u"Ambidexterity view not implemented")
         type_ = sniff_type(body)
         if type_ != "text/xml":
             body, type_ = self._prepare_html(body)
@@ -42,7 +45,7 @@ class AmbidexterityView(BrowserView):
     """
 
     def __call__(self):
-        vptr = ViewPageTemplateResource('simple_test_type')
+        vptr = ViewPageTemplateResource(self.context.portal_type)
         bpt = BoundPageTemplate(vptr, self)
         return bpt()
 

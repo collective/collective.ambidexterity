@@ -91,8 +91,17 @@ class TestSetup(unittest.TestCase):
         self.assertEqual([s.value for s in vocab], [u'a', u'b', u'c'])
 
     def test_view_default(self):
+        # make sure we're returning the ambidexterity view when implemented
         test_item = createContent('simple_test_type', title=u'The Meaning of Life')
         test_item.id = 'test_item'
         self.portal['test_item'] = test_item
         view = self.portal['test_item'].restrictedTraverse('@@ambidexterityview')
         self.assertEqual(view(), u'view.pt for test_item')
+        # but not when there's no such resource
+        test_item = createContent('Folder', title=u'A Folder')
+        test_item.id = 'afolder'
+        self.portal.afolder = test_item
+        view = self.portal.afolder.restrictedTraverse('@@ambidexterityview')
+        with self.assertRaises(KeyError) as cm:
+            view()
+        self.assertEqual(cm.exception.message, 'Ambidexterity view not implemented')

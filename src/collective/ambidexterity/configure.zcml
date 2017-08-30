@@ -50,7 +50,6 @@
       name="ambidexterityview"
       for="plone.dexterity.interfaces.IDexterityContainer"
       class="collective.ambidexterity.view.AmbidexterityView"
-      template="view.pt"
       permission="zope2.View"
       />
 
@@ -58,7 +57,6 @@
       name="ambidexterityview"
       for="plone.dexterity.interfaces.IDexterityItem"
       class="collective.ambidexterity.view.AmbidexterityView"
-      template="view.pt"
       permission="zope2.View"
       />
 
