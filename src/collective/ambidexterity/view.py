@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """ If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type
-    as a text file, it will be reachable at @@ambidexterityview.
+    as a text file, it will be usable at @@ambidexterityview.
 """
 
 
@@ -18,16 +18,15 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
         _prefix = self.get_path_from_prefix(_prefix)
         # ViewPageTemplateFile.__init__() does some file checking we wish to skip.
         # super(ViewPageTemplateFile, self).__init__(filename, _prefix)
-        self.filename = portal_type
+        self.filename = '/'.join(('ambidexterity', portal_type, 'view.pt'))
         if content_type is not None:
             self.content_type = content_type
 
     def _read_file(self):
         pr = api.portal.get_tool(name='portal_resources')
-        path = '/'.join(('ambidexterity', self.filename, 'view.pt'))
         # TODO: give a meaningful message if we can't find the script
-        body = pr.restrictedTraverse(path).data
         __traceback_info__ = self.filename
+        body = pr.restrictedTraverse(filename).data
         return body, 'test/html'
         # __traceback_info__ = self.filename
         # f = open(self.filename, "rb")
