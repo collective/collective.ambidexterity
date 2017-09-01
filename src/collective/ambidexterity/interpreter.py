@@ -11,8 +11,10 @@ import datetime
 import re
 import AccessControl.ZopeGuards as ZopeGuards
 
+# Make useful modules visible
 for name in ('datetime', 'time', 're'):
     ModuleSecurityInfo(name).setDefaultAccess('allow')
+# Include their key types
 allow_type(type(re.compile('')))
 allow_type(type(re.match('x', 'x')))
 allow_type(type(datetime.date(2017, 1, 1)))

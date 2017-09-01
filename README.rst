@@ -91,6 +91,12 @@ If a view.pt template file is placed at portal_resources/ambidexterity/content_t
 You may also set other template files and traverse to them at URLs like @@ambidexterityview/custom_file.js.
 No matter the extension, they will be handled as page templates.
 
+Cautions
+--------
+
+This package marks the `re`, `datetime` and `time` modules as safe for use in RestrictedPython.
+That will affect all PythonScripts.
+
 Contribute
 ----------
 
