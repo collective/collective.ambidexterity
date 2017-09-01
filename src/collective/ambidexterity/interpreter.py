@@ -5,12 +5,11 @@
 
 from AccessControl import allow_type
 from AccessControl import ModuleSecurityInfo
-from AccessControl.ZopeGuards import get_safe_globals
-from AccessControl.ZopeGuards import guarded_getattr
 from RestrictedPython import compile_restricted
 
 import datetime
 import re
+import AccessControl.ZopeGuards as ZopeGuards
 
 for name in ('datetime', 'time', 're'):
     ModuleSecurityInfo(name).setDefaultAccess('allow')
@@ -28,11 +27,8 @@ class AmbidexterityProgram(object):
         self.code = compile_restricted(code, "<string>", "exec")
 
     def execute(self, locals=None, output=None):
-        my_globals = get_safe_globals()
-        # my_globals['__builtins__'] = safe_builtins
-        # my_globals['__builtins__'].update(limited_builtins)
-        # my_globals.update(utility_builtins)
-        my_globals['_getattr_'] = guarded_getattr
+        my_globals = ZopeGuards.get_safe_globals()
+        my_globals['_getattr_'] = ZopeGuards.guarded_getattr
         if locals is None:
             locals = {}
         exec self.code in my_globals, locals
