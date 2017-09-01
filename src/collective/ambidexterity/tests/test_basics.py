@@ -4,9 +4,11 @@
 from collective.ambidexterity import Validator
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
 from plone.app.testing import applyProfile
+from plone.app.testing import logout
 from plone.dexterity.utils import createContent
 from zope.interface import Invalid
 from zope.schema.vocabulary import SimpleVocabulary
+from AccessControl import Unauthorized
 
 import unittest
 
@@ -62,6 +64,14 @@ class TestSetup(unittest.TestCase):
         applyProfile(self.portal, 'collective.ambidexterity:testing')
         self.test_schema = self.portal.portal_types.simple_test_type.lookupSchema()
 
+        test_item = createContent('simple_test_type', title=u'The Meaning of Life')
+        test_item.id = 'test_item'
+        self.portal['test_item'] = test_item
+
+        test_item = createContent('Folder', title=u'A Folder')
+        test_item.id = 'afolder'
+        self.portal.afolder = test_item
+
     def test_validator(self):
         fti = self.portal.portal_types.simple_test_type
         schema = fti.lookupSchema()
@@ -94,25 +104,35 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(type(vocab), type(SimpleVocabulary.fromItems([])))
         self.assertEqual([s.value for s in vocab], [u'a', u'b', u'c'])
 
-    def test_views(self):
+    def test_default_view(self):
         # make sure we're returning the ambidexterity view when implemented.
         # First, create an item that we can traverse.
-        test_item = createContent('simple_test_type', title=u'The Meaning of Life')
-        test_item.id = 'test_item'
-        self.portal['test_item'] = test_item
-        test_item = self.portal['test_item']
         # Now, try the default view
         self.assertEqual(self.portal.test_item(), u'view.pt for test_item')
-        # Then a custom view
+
+    def test_custom_view(self):
         self.assertEqual(
-            self.portal.test_item.restrictedTraverse("@@ambidexterityview/custom.js")(),
+            self.portal.restrictedTraverse("test_item/@@ambidexterityview/custom.js")(),
             u'custom.js for test_item'
         )
-        # but not when there's no such resource
-        test_item = createContent('Folder', title=u'A Folder')
-        test_item.id = 'afolder'
-        self.portal.afolder = test_item
+
+    def test_not_implemented_view(self):
+        # Doesn't work if there's no matching resource for the content type
         view = self.portal.afolder.restrictedTraverse('@@ambidexterityview')
         with self.assertRaises(KeyError) as cm:
             view()
         self.assertEqual(cm.exception.message, 'Ambidexterity view not implemented')
+
+    def test_unauthorized_view(self):
+        self.portal.restrictedTraverse("test_item")
+        self.portal.restrictedTraverse("test_item/@@ambidexterityview")
+        self.portal.restrictedTraverse("test_item/@@ambidexterityview/custom.js")
+        logout()
+        # restrictedTraverse is now anonymous
+        with self.assertRaises(Unauthorized):
+            self.portal.restrictedTraverse("test_item")
+        with self.assertRaises(Unauthorized):
+            self.portal.restrictedTraverse("test_item/@@ambidexterityview")
+        with self.assertRaises(Unauthorized):
+            self.portal.restrictedTraverse("test_item/@@ambidexterityview/custom.js")
+

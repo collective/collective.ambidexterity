@@ -1,58 +1,39 @@
 # -*- coding: utf-8 -*-
 """
-    zope.untrustedpython support
+    RestrictedPython support
 """
 
-from zope.security.checker import defineChecker
-from zope.security.checker import NamesChecker
-from zope.security.checker import DuplicationError
-from zope.untrustedpython.interpreter import CompiledProgram
+from AccessControl import allow_type
+from AccessControl import ModuleSecurityInfo
+from AccessControl.ZopeGuards import get_safe_globals
+from AccessControl.ZopeGuards import guarded_getattr
+from RestrictedPython import compile_restricted
 
 import datetime
-import random
 import re
-import time
+
+for name in ('datetime', 'time', 're'):
+    ModuleSecurityInfo(name).setDefaultAccess('allow')
+allow_type(type(re.compile('')))
+allow_type(type(re.match('x', 'x')))
+allow_type(type(datetime.date(2017, 1, 1)))
+allow_type(type(datetime.datetime(2017, 1, 1)))
 
 
-def declareSafe(atype):
-    try:
-        defineChecker(
-            atype,
-            NamesChecker([attribute for attribute in dir(atype) if attribute[0] != '_'])
-        )
-    except DuplicationError:
-        print atype, "was duplicated"
-        pass
+class AmbidexterityProgram(object):
+    # set up this way in case we want to do some caching at some
+    # point in the future.
 
-# For some reason, these initializations need to be done late.
-# perhaps some other module is clearing them if it's initialized
-# after this.
-initialized = False
-
-
-def init():
-    global initialized
-    if not initialized:
-        declareSafe(datetime)
-        # The items below will cause duplicate errors.
-        # declareSafe(type(datetime.date(2017, 1, 1)))
-        # declareSafe(type(datetime.datetime(2017, 1, 1)))
-
-        declareSafe(random)
-        declareSafe(time)
-
-        declareSafe(re)
-        declareSafe(type(re.compile('')))
-        declareSafe(type(re.compile('').match('')))
-        initialized = True
-
-
-class AmbidexterityProgram(CompiledProgram):
+    def __init__(self, code):
+        self.code = compile_restricted(code, "<string>", "exec")
 
     def execute(self, locals=None, output=None):
-        init()
-        my_globals = dict()
+        my_globals = get_safe_globals()
+        # my_globals['__builtins__'] = safe_builtins
+        # my_globals['__builtins__'].update(limited_builtins)
+        # my_globals.update(utility_builtins)
+        my_globals['_getattr_'] = guarded_getattr
         if locals is None:
             locals = {}
-        self.exec_(my_globals, locals=locals, output=output)
+        exec self.code in my_globals, locals
         return locals

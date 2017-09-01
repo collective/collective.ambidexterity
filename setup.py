@@ -41,7 +41,7 @@ setup(
         'plone.api',
         'Products.GenericSetup',
         'setuptools',
-        'zope.untrustedpython',
+        'RestrictedPython',
     ],
     extras_require={
         'test': [
