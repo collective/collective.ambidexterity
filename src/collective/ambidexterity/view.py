@@ -15,6 +15,29 @@ from plone import api
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
+from collective.ambidexterity.utilities import getContentTypeFolder
+
+
+BASE_VIEW_TEMPLATE = """<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+    xmlns:tal="http://xml.zope.org/namespaces/tal"
+    xmlns:metal="http://xml.zope.org/namespaces/metal"
+    xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+    lang="en"
+    metal:use-macro="context/main_template/macros/master"
+    i18n:domain="plone">
+<body>
+
+<metal:content-core fill-slot="content-core">
+<metal:content-core define-macro="content-core">
+  <p>
+    This is the default Ambidexterity view for <span tal:replace="context/portal_type" />.
+  </p>
+</metal:content-core>
+</metal:content-core>
+
+</body>
+</html>
+"""
 
 
 class ViewPageTemplateResource(ViewPageTemplateFile):
@@ -62,3 +85,10 @@ class AmbidexterityView(BrowserView):
     def __getitem__(self, name):
         self.section = name
         return self
+
+
+def addViewTemplate(ctype_name, template_id="view.pt"):
+    cf = getContentTypeFolder(ctype_name)
+    assert(cf.get(template_id) is None)
+    cf.manage_addFile(template_id)
+    cf[template_id].update_data(BASE_VIEW_TEMPLATE)

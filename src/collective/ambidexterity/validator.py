@@ -23,9 +23,30 @@
 """
 
 from interpreter import AmbidexterityProgram
+from utilities import addFieldScript
 from utilities import getAmbidexterityScript
 from z3c.form.validator import SimpleFieldValidator
 from zope.interface import Invalid
+
+
+VALIDATOR_SCRIPT = """# Validator script.
+# Use this to set the validator for a Dexterity content-type field.
+# This script will be executed in a RestrictedPython environment.
+# local variables available to you:
+#     context -- the folder in which the item is being added.
+#     value -- the value to test for validity.
+# If the validator script determines the value is invalid, it should do
+# one of the following:
+#
+#     * print an error message using Python's "print"; or,
+#
+#     * assign an error message to a variable named "error_message".
+#
+# If the value is valid, do not do either of the above.
+# The absence of an error message is taken to mean all is OK.
+
+error_message = u"This is an error message."
+"""
 
 
 class Validator(SimpleFieldValidator):
@@ -44,3 +65,7 @@ class Validator(SimpleFieldValidator):
         result = rez['_print']().strip()
         if len(result) > 0:
             raise Invalid(result)
+
+
+def addValidatorScript(ctype_name, field_name):
+    addFieldScript(ctype_name, field_name, 'validate.py', VALIDATOR_SCRIPT)

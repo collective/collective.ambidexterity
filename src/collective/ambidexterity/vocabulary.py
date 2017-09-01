@@ -13,6 +13,7 @@
 """
 
 from interpreter import AmbidexterityProgram
+from utilities import addFieldScript
 from utilities import getAmbidexterityScript
 from utilities import getFrameLocal
 from zope.interface import provider
@@ -20,6 +21,17 @@ from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary
 
 import inspect
+
+VOCABULARY_SCRIPT = """# Vocabulary script.
+# Use this to set the default for a Dexterity content-type field.
+# This script will be executed in a RestrictedPython environment.
+# local variables available to you:
+#     context -- the folder in which the item is being added.
+# Set your vocabulary by assigning it to "vocabulary".
+# It should be a list of values or a list of (value, token) items.
+
+vocabulary = []
+"""
 
 
 @provider(IContextSourceBinder)
@@ -44,3 +56,7 @@ def vocabulary(context):
                 'Vocabulary scripts must return lists of values or items.'
             )
     return SimpleVocabulary([])
+
+
+def addVocabularyScript(ctype_name, field_name):
+    addFieldScript(ctype_name, field_name, 'vocabulary.py', VOCABULARY_SCRIPT)

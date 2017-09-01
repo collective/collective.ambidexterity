@@ -5,6 +5,10 @@ from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATIO
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
 from collective.ambidexterity.default import addDefaultScript
+from collective.ambidexterity.validator import addValidatorScript
+from collective.ambidexterity.vocabulary import addVocabularyScript
+from collective.ambidexterity.view import addViewTemplate
+from collective.ambidexterity.view import ViewPageTemplateResource
 from collective.ambidexterity.utilities import getAmbidexterityScript
 
 import unittest
@@ -31,3 +35,23 @@ class TestSetup(unittest.TestCase):
         addDefaultScript('simple_test_type', 'test_integer_field')
         my_script = getAmbidexterityScript('simple_test_type', 'test_integer_field', 'default.py')
         self.assertTrue('default = None' in my_script)
+
+    def test_add_vocabulary_script(self):
+        addVocabularyScript('simple_test_type', 'test_choice_field')
+        my_script = getAmbidexterityScript('simple_test_type', 'test_choice_field', 'vocabulary.py')
+        self.assertTrue('vocabulary = []' in my_script)
+
+    def test_add_validator_script(self):
+        addValidatorScript('simple_test_type', 'test_string_field')
+        my_script = getAmbidexterityScript('simple_test_type', 'test_string_field', 'validate.py')
+        self.assertTrue('error_message =' in my_script)
+
+    def test_add_view_template(self):
+        addViewTemplate('simple_test_type')
+        vptr = ViewPageTemplateResource(
+            'simple_test_type',
+            template_name='view.pt'
+        )
+        body, content_type = vptr._read_file()
+        self.assertTrue('This is the default Ambidexterity view' in body)
+        self.assertEqual(content_type, 'text/html')
