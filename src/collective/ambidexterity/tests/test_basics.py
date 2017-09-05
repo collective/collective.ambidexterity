@@ -4,9 +4,7 @@
 from AccessControl import Unauthorized
 from collective.ambidexterity import Validator
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
-from collective.ambidexterity.utilities import getResourcesInventory
-from collective.ambidexterity.utilities import getSimpleDexterityFTIs
-from collective.ambidexterity.utilities import getTypesWithModelSources
+from collective.ambidexterity import utilities
 from plone.app.testing import applyProfile
 from plone.app.testing import logout
 from plone.dexterity.utils import createContent
@@ -140,15 +138,15 @@ class TestSetup(unittest.TestCase):
             self.portal.restrictedTraverse("test_item/@@ambidexterityview/custom.js")
 
     def test_getFTIs(self):
-        ftis = getSimpleDexterityFTIs()
+        ftis = utilities.getSimpleDexterityFTIs()
         self.assertEqual(len(ftis), 1)
         self.assertEqual(ftis[0].getId(), 'simple_test_type')
-        ftis = getTypesWithModelSources()
+        ftis = utilities.getTypesWithModelSources()
         self.assertEqual(len(ftis), 1)
         self.assertEqual(ftis[0].getId(), 'simple_test_type')
 
     def test_inventory(self):
-        self.assertEquals(getResourcesInventory(), {
+        self.assertEquals(utilities.getResourcesInventory(), {
             'simple_test_type': {
                 'fields': {
                     'test_integer_field': {'has_default': True, 'has_vocabulary': False, 'has_validator': False},

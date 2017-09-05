@@ -92,3 +92,13 @@ def addViewTemplate(ctype_name, template_id="view.pt"):
     assert(cf.get(template_id) is None)
     cf.manage_addFile(template_id)
     cf[template_id].update_data(BASE_VIEW_TEMPLATE)
+
+
+def updateViewTemplate(ctype_name, body, template_id="view.pt"):
+    cf = getContentTypeFolder(ctype_name)
+    cf[template_id].update_data(body)
+
+
+def rmViewTemplate(ctype_name, template_id="view.pt"):
+    cf = getContentTypeFolder(ctype_name)
+    del cf[template_id]

@@ -5,8 +5,14 @@ from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATIO
 from plone.app.testing import applyProfile
 from plone.dexterity.utils import createContent
 from collective.ambidexterity.default import addDefaultScript
+from collective.ambidexterity.default import updateDefaultScript
+from collective.ambidexterity.default import rmDefaultScript
 from collective.ambidexterity.validator import addValidatorScript
+from collective.ambidexterity.validator import updateValidatorScript
+from collective.ambidexterity.validator import rmValidatorScript
 from collective.ambidexterity.vocabulary import addVocabularyScript
+from collective.ambidexterity.vocabulary import updateVocabularyScript
+from collective.ambidexterity.vocabulary import rmVocabularyScript
 from collective.ambidexterity.view import addViewTemplate
 from collective.ambidexterity.view import ViewPageTemplateResource
 from collective.ambidexterity.utilities import getAmbidexterityScript
@@ -36,15 +42,51 @@ class TestSetup(unittest.TestCase):
         my_script = getAmbidexterityScript('simple_test_type', 'test_integer_field', 'default.py')
         self.assertTrue('default = None' in my_script)
 
+    def test_update_default_script(self):
+        addDefaultScript('simple_test_type', 'test_integer_field')
+        updateDefaultScript('simple_test_type', 'test_integer_field', 'default = 42')
+        my_script = getAmbidexterityScript('simple_test_type', 'test_integer_field', 'default.py')
+        self.assertTrue('default = 42' in my_script)
+
+    def test_rm_default_script(self):
+        addDefaultScript('simple_test_type', 'test_integer_field')
+        rmDefaultScript('simple_test_type', 'test_integer_field')
+        with self.assertRaises(KeyError):
+            getAmbidexterityScript('simple_test_type', 'test_integer_field', 'default.py')
+
     def test_add_vocabulary_script(self):
         addVocabularyScript('simple_test_type', 'test_choice_field')
         my_script = getAmbidexterityScript('simple_test_type', 'test_choice_field', 'vocabulary.py')
         self.assertTrue('vocabulary = []' in my_script)
 
+    def test_update_vocabulary_script(self):
+        addVocabularyScript('simple_test_type', 'test_choice_field')
+        updateVocabularyScript('simple_test_type', 'test_choice_field', "vocabulary = [('test', ), ]")
+        my_script = getAmbidexterityScript('simple_test_type', 'test_choice_field', 'vocabulary.py')
+        self.assertTrue("vocabulary = [('test', ), ]" in my_script)
+
+    def test_rm_vocabulary_script(self):
+        addVocabularyScript('simple_test_type', 'test_choice_field')
+        rmVocabularyScript('simple_test_type', 'test_choice_field')
+        with self.assertRaises(KeyError):
+            getAmbidexterityScript('simple_test_type', 'test_choice_field', 'vocabulary.py')
+
     def test_add_validator_script(self):
         addValidatorScript('simple_test_type', 'test_string_field')
         my_script = getAmbidexterityScript('simple_test_type', 'test_string_field', 'validate.py')
         self.assertTrue('error_message =' in my_script)
+
+    def test_update_validator_script(self):
+        addValidatorScript('simple_test_type', 'test_string_field')
+        updateValidatorScript('simple_test_type', 'test_string_field', "error_message = 'something'")
+        my_script = getAmbidexterityScript('simple_test_type', 'test_string_field', 'validate.py')
+        self.assertTrue("error_message = 'something'" in my_script)
+
+    def test_rm_validator_script(self):
+        addValidatorScript('simple_test_type', 'test_string_field')
+        rmValidatorScript('simple_test_type', 'test_string_field')
+        with self.assertRaises(KeyError):
+            getAmbidexterityScript('simple_test_type', 'test_string_field', 'validate.py')
 
     def test_add_view_template(self):
         addViewTemplate('simple_test_type')
