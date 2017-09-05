@@ -20,14 +20,6 @@ class TestSetup(unittest.TestCase):
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
 
-    def test_getFTIs(self):
-        ftis = models.getSimpleDexterityFTIs()
-        self.assertEqual(len(ftis), 1)
-        self.assertEqual(ftis[0].getId(), 'simple_test_type')
-        ftis = models.getTypesWithModelSources()
-        self.assertEqual(len(ftis), 1)
-        self.assertEqual(ftis[0].getId(), 'simple_test_type')
-
     def test_usefulTypes(self):
         types = models.usefulTypes()
         self.assertEqual(len(types), 1)

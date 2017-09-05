@@ -5,34 +5,12 @@
 
 from lxml import etree
 from plone import api
+import utilities
 
 import re
 
-D_FTI = 'Dexterity FTI'
-SIMPLE_DEXTERITY_CLASSES = (
-    'plone.dexterity.content.Container',
-    'plone.dexterity.content.Item',
-)
 SCHEMA_NAMESPACE = 'http://namespaces.plone.org/supermodel/schema'
 FORM_NAMESPACE = 'http://namespaces.plone.org/supermodel/form'
-
-
-def getDexterityTypes():
-    pt = api.portal.get_tool(name='portal_types')
-    return pt.objectValues('Dexterity FTI')
-
-
-def getSimpleDexterityFTIs():
-    # return fti's for types that use a simple Dexterity class
-    rez = []
-    for fti in getDexterityTypes():
-        if fti.klass in SIMPLE_DEXTERITY_CLASSES:
-            rez.append(fti)
-    return rez
-
-
-def getTypesWithModelSources():
-    return [fti for fti in getDexterityTypes() if getattr(fti, 'model_source', None)]
 
 
 def qname(tag, ns=SCHEMA_NAMESPACE):
@@ -51,7 +29,7 @@ def efind(e, tag, ns=SCHEMA_NAMESPACE):
 
 def usefulTypes():
     rez = []
-    for fti in getSimpleDexterityFTIs():
+    for fti in utilities.getSimpleDexterityFTIs():
         d = {}
         d['title'] = fti.title
         d['id'] = fti.getId()
@@ -103,6 +81,14 @@ def setModelSource(id, source):
 
 def getModelRoot(id):
     return etree.XML(getModelSource(id))
+
+
+def getFieldList(ctype_name):
+    root = getModelRoot(ctype_name)
+    rez = []
+    for field in efindall(root, 'field'):
+        rez.append(field.attrib['name'])
+    return rez
 
 
 def setModelSourceFromXML(id, root):
@@ -195,4 +181,3 @@ def setValidator(id, field_name):
 def setAmbidexterityView(id):
     fti = getFTI(id)
     fti.manage_changeProperties(view_methods=['@@ambidexterityview', ])
-

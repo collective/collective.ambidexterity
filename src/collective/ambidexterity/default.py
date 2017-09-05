@@ -17,6 +17,8 @@ from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
 from utilities import getAmbidexterityScript
 from utilities import getFrameLocal
+from utilities import rmFieldScript
+from utilities import updateFieldScript
 from zope.interface import provider
 from zope.schema.interfaces import IContextAwareDefaultFactory
 
@@ -50,3 +52,11 @@ def default(context):
 
 def addDefaultScript(ctype_name, field_name):
     addFieldScript(ctype_name, field_name, 'default.py', DEFAULT_SCRIPT)
+
+
+def rmDefaultScript(ctype_name, field_name):
+    rmFieldScript(ctype_name, field_name, 'default.py')
+
+
+def updateDefaultScript(ctype_name, field_name, body):
+    updateFieldScript(ctype_name, field_name, 'default.py', body)

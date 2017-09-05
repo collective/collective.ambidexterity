@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
 
 from plone import api
+from collective.ambidexterity import models
 
 import re
 
+D_FTI = 'Dexterity FTI'
+SIMPLE_DEXTERITY_CLASSES = (
+    'plone.dexterity.content.Container',
+    'plone.dexterity.content.Item',
+)
 plone_munge = re.compile(r"""plone_\d+_""", flags=re.IGNORECASE)
 
 
@@ -19,11 +25,60 @@ def demunge(s):
 
 
 def getAmbidexterityScript(ctype_name, field_name, id):
+    # ctype_name is from an interface, so it's been munged.
     # Return the body of a text file in portal_resources/ambidexterity/content_type/field/id
     pr = api.portal.get_tool(name='portal_resources')
     path = '/'.join(('ambidexterity', demunge(ctype_name), field_name, id))
     # TODO: give a meaningful message if we can't find the script
     return pr.restrictedTraverse(path).data
+
+
+def getDexterityTypes():
+    pt = api.portal.get_tool(name='portal_types')
+    return pt.objectValues(D_FTI)
+
+
+def getSimpleDexterityFTIs():
+    # return fti's for types that use a simple Dexterity class
+    rez = []
+    for fti in getDexterityTypes():
+        if fti.klass in SIMPLE_DEXTERITY_CLASSES:
+            rez.append(fti)
+    return rez
+
+
+def getTypesWithModelSources():
+    return [fti for fti in getDexterityTypes() if getattr(fti, 'model_source', None)]
+
+
+def getResourcesInventory():
+    # return an inventory of current resources
+    resources = {}
+    for fti in getSimpleDexterityFTIs():
+        fid = fti.getId()
+        content_type = dict(
+            title=fti.title,
+            fields={},
+            has_model_source=getattr(fti, 'model_source', None) is not None,
+        )
+        if content_type['has_model_source']:
+            pr = api.portal.get_tool(name='portal_resources')
+            ambidexterity_folder = pr.get('ambidexterity')
+            if ambidexterity_folder is not None:
+                type_folder = ambidexterity_folder.get(fid)
+                if type_folder is not None:
+                    for field in models.getFieldList(fid):
+                        field_folder = type_folder.get(field)
+                        if field_folder is None:
+                            continue
+                        script_ids = field_folder.objectIds()
+                        content_type['fields'][field] = dict(
+                            has_default='default.py' in script_ids,
+                            has_validator='validate.py' in script_ids,
+                            has_vocabulary='vocabulary.py' in script_ids,
+                        )
+        resources[fid] = content_type
+    return resources
 
 
 # Use these only when mutating the ambidexterity resources,
@@ -61,4 +116,14 @@ def addFieldScript(ctype_name, field_name, script_id, body):
     ff = getFieldFolder(ctype_name, field_name)
     assert(ff.get(script_id) is None)
     ff.manage_addFile(script_id)
+    ff[script_id].update_data(body)
+
+
+def rmFieldScript(ctype_name, field_name, script_id):
+    ff = getFieldFolder(ctype_name, field_name)
+    del ff[script_id]
+
+
+def updateFieldScript(ctype_name, field_name, script_id, body):
+    ff = getFieldFolder(ctype_name, field_name)
     ff[script_id].update_data(body)

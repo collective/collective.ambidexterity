@@ -25,6 +25,8 @@
 from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
 from utilities import getAmbidexterityScript
+from utilities import rmFieldScript
+from utilities import updateFieldScript
 from z3c.form.validator import SimpleFieldValidator
 from zope.interface import Invalid
 
@@ -69,3 +71,11 @@ class Validator(SimpleFieldValidator):
 
 def addValidatorScript(ctype_name, field_name):
     addFieldScript(ctype_name, field_name, 'validate.py', VALIDATOR_SCRIPT)
+
+
+def rmValidatorScript(ctype_name, field_name):
+    rmFieldScript(ctype_name, field_name, 'validate.py')
+
+
+def updateValidatorScript(ctype_name, field_name, body):
+    updateFieldScript(ctype_name, field_name, 'validate.py', body)

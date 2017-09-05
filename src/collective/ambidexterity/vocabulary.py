@@ -16,6 +16,8 @@ from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
 from utilities import getAmbidexterityScript
 from utilities import getFrameLocal
+from utilities import rmFieldScript
+from utilities import updateFieldScript
 from zope.interface import provider
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary
@@ -60,3 +62,11 @@ def vocabulary(context):
 
 def addVocabularyScript(ctype_name, field_name):
     addFieldScript(ctype_name, field_name, 'vocabulary.py', VOCABULARY_SCRIPT)
+
+
+def rmVocabularyScript(ctype_name, field_name):
+    rmFieldScript(ctype_name, field_name, 'vocabulary.py')
+
+
+def updateVocabularyScript(ctype_name, field_name, body):
+    updateFieldScript(ctype_name, field_name, 'vocabulary.py', body)

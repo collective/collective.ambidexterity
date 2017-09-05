@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
 """Idea tests for this package."""
 
+from AccessControl import Unauthorized
 from collective.ambidexterity import Validator
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
+from collective.ambidexterity.utilities import getResourcesInventory
+from collective.ambidexterity.utilities import getSimpleDexterityFTIs
+from collective.ambidexterity.utilities import getTypesWithModelSources
 from plone.app.testing import applyProfile
 from plone.app.testing import logout
 from plone.dexterity.utils import createContent
 from zope.interface import Invalid
 from zope.schema.vocabulary import SimpleVocabulary
-from AccessControl import Unauthorized
 
 import unittest
 
@@ -136,3 +139,23 @@ class TestSetup(unittest.TestCase):
         with self.assertRaises(Unauthorized):
             self.portal.restrictedTraverse("test_item/@@ambidexterityview/custom.js")
 
+    def test_getFTIs(self):
+        ftis = getSimpleDexterityFTIs()
+        self.assertEqual(len(ftis), 1)
+        self.assertEqual(ftis[0].getId(), 'simple_test_type')
+        ftis = getTypesWithModelSources()
+        self.assertEqual(len(ftis), 1)
+        self.assertEqual(ftis[0].getId(), 'simple_test_type')
+
+    def test_inventory(self):
+        self.assertEquals(getResourcesInventory(), {
+            'simple_test_type': {
+                'fields': {
+                    'test_integer_field': {'has_default': True, 'has_vocabulary': False, 'has_validator': False},
+                    'test_string_field': {'has_default': True, 'has_vocabulary': False, 'has_validator': True},
+                    'test_choice_field': {'has_default': False, 'has_vocabulary': True, 'has_validator': False}
+                },
+                'has_model_source': True,
+                'title': 'Simple Test Type'
+            }
+        })
