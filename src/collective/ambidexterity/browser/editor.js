@@ -18,7 +18,7 @@ jQuery(function($) {
             fields.append(
                 $("<option />", {
                     value: key,
-                    html: key
+                    html: val.title
                 })
             );
         });
