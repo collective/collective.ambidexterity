@@ -149,11 +149,26 @@ class TestSetup(unittest.TestCase):
         self.assertEquals(utilities.getResourcesInventory(), {
             'simple_test_type': {
                 'fields': {
-                    'test_integer_field': {'has_default': True, 'has_vocabulary': False, 'has_validator': False},
-                    'test_string_field': {'has_default': True, 'has_vocabulary': False, 'has_validator': True},
-                    'test_choice_field': {'has_default': False, 'has_vocabulary': True, 'has_validator': False}
+                    'test_integer_field': {
+                        'has_default': True,
+                        'has_vocabulary': False,
+                        'has_validator': False,
+                        'title': 'Test Integer Field'
+                    },
+                    'test_string_field': {
+                        'has_default': True,
+                        'has_vocabulary': False,
+                        'has_validator': True,
+                        'title': 'Test String Field'
+                    },
+                    'test_choice_field': {
+                        'has_default': False,
+                        'has_vocabulary': True,
+                        'has_validator': False,
+                        'title': 'Test Choice Field'
+                    }
                 },
                 'has_model_source': True,
                 'title': 'Simple Test Type'
-            }
+            },
         })

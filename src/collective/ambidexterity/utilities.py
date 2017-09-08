@@ -53,6 +53,9 @@ def getTypesWithModelSources():
 
 def getResourcesInventory():
     # return an inventory of current resources
+
+    pr = api.portal.get_tool(name='portal_resources')
+    ambidexterity_folder = pr.get('ambidexterity')
     resources = {}
     for fti in getSimpleDexterityFTIs():
         fid = fti.getId()
@@ -62,21 +65,25 @@ def getResourcesInventory():
             has_model_source=getattr(fti, 'model_source', None) is not None,
         )
         if content_type['has_model_source']:
-            pr = api.portal.get_tool(name='portal_resources')
-            ambidexterity_folder = pr.get('ambidexterity')
-            if ambidexterity_folder is not None:
+            if ambidexterity_folder is None:
+                type_folder = None
+            else:
                 type_folder = ambidexterity_folder.get(fid)
+            for field, title in models.getFieldList(fid):
                 if type_folder is not None:
-                    for field in models.getFieldList(fid):
-                        field_folder = type_folder.get(field)
-                        if field_folder is None:
-                            continue
-                        script_ids = field_folder.objectIds()
-                        content_type['fields'][field] = dict(
-                            has_default='default.py' in script_ids,
-                            has_validator='validate.py' in script_ids,
-                            has_vocabulary='vocabulary.py' in script_ids,
-                        )
+                    field_folder = type_folder.get(field)
+                else:
+                    field_folder = None
+                if field_folder is None:
+                    script_ids = []
+                else:
+                    script_ids = field_folder.objectIds()
+                content_type['fields'][field] = dict(
+                    title=title,
+                    has_default='default.py' in script_ids,
+                    has_validator='validate.py' in script_ids,
+                    has_vocabulary='vocabulary.py' in script_ids,
+                )
         resources[fid] = content_type
     return resources
 

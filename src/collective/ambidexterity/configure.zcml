@@ -12,6 +12,8 @@
 
   <include package="plone.resource" file="meta.zcml" />
 
+  <include package=".browser" />
+
   <include package="plone.resource" />
   <include package="plone.resourceeditor" />
 
@@ -51,6 +53,7 @@
       for="plone.dexterity.interfaces.IDexterityContainer"
       class="collective.ambidexterity.view.AmbidexterityView"
       permission="zope2.View"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
       />
 
   <browser:page
@@ -58,6 +61,7 @@
       for="plone.dexterity.interfaces.IDexterityItem"
       class="collective.ambidexterity.view.AmbidexterityView"
       permission="zope2.View"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
       />
 
 </configure>

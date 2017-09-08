@@ -87,7 +87,7 @@ def getFieldList(ctype_name):
     root = getModelRoot(ctype_name)
     rez = []
     for field in efindall(root, 'field'):
-        rez.append(field.attrib['name'])
+        rez.append([field.attrib['name'], efind(field, 'title').text])
     return rez
 
 

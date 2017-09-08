@@ -1,0 +1,32 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="collective.ambidexterity"
+    >
+
+  <browser:page
+      name="ambidexterityeditor"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class="collective.ambidexterity.browser.editor.EditorView"
+      template="editor.pt"
+      permission="plone.schemaeditor.ManageSchemata"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+      />
+
+  <browser:page
+      name="ambidexterityajax"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class="collective.ambidexterity.browser.editor.EditorAjax"
+      permission="plone.schemaeditor.ManageSchemata"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+      allowed_attributes="resource_inventory"
+      />
+
+  <browser:resource
+    name="collective.ambidexterity.editor.js"
+    file="editor.js"
+    layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+    />
+
+</configure>
