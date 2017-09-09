@@ -4,31 +4,33 @@ jQuery(function($) {
 
     "use strict";
 
-    var inventory = null;
+    var inventory = null,
+        content_type_select = $("#content_types"),
+        fields_select = $("#cfields"),
+        field_scripts = ['default', 'validator', 'vocabulary'],
+        script_operators = ['add', 'edit', 'remove'];
 
     function get_authenticator() {
         return $('input[name="_authenticator"]').val();
     }
 
     function fill_fields(selected) {
-        var fields = $("#cfields");
-
-        fields.empty();
+        fields_select.empty();
         $.each(inventory[selected].fields, function(key, val) {
-            fields.append(
+            fields_select.append(
                 $("<option />", {
                     value: key,
                     html: val.title
                 })
             );
         });
+        fields_select.change();
     }
 
     function fill_content_select() {
-        var select = $("#content_types"),
-            selected = select.val();
+        var selected = content_type_select.val();
 
-        select.empty();
+        content_type_select.empty();
         $.each(inventory, function(key, val) {
             var new_option;
 
@@ -36,30 +38,61 @@ jQuery(function($) {
                 value: key,
                 html: val.title
             });
-            select.append(
-                new_option
-            );
+            content_type_select.append(new_option);
         });
         if (!selected) {
-            selected = select.children().eq(0).val();
+            selected = content_type_select.children().eq(0).val();
         }
-        select.val(selected);
+        content_type_select.val(selected);
         fill_fields(selected);
     }
 
     function get_inventory() {
         $.getJSON("@@ambidexterityajax/resource_inventory?_authenticator=" + get_authenticator(), function(data) {
-            var select = $("#content_types");
 
             inventory = data;
             fill_content_select();
-            select.change(function () {
-                fill_fields(select.val());
-            });
         });
     }
 
-    get_inventory();
+    content_type_select.change(function () {
+        fill_fields(content_type_select.val());
+    });
 
+    fields_select.change(function () {
+        var content_type = content_type_select.val(),
+            field_name = fields_select.val(),
+            field_info = inventory[content_type].fields[field_name];
+
+        if (field_name) {
+            $.each(field_scripts, function(index, value) {
+                if (field_info['have_' + value]) {
+                    $('#add_' + value).hide();
+                    $('#edit_' + value).show();
+                    $('#remove_' + value).show();
+                } else {
+                    $('#add_' + value).show();
+                    $('#edit_' + value).hide();
+                    $('#remove_' + value).hide();
+                }
+            });
+        } else {
+            $.each(field_scripts, function(index, value) {
+                $('#add_' + value).hide();
+                $('#edit_' + value).hide();
+                $('#remove_' + value).hide();
+            });
+        }
+    });
+
+    $("form#available_actions button").click(function (e) {
+        var button_id = $(this).attr('id'),
+            content_type = content_type_select.val(),
+            field_name = fields_select.val();
+
+        alert(content_type + ' ' + field_name + ' ' + button_id);
+    });
+
+    get_inventory();
 
 });

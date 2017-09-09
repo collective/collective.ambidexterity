@@ -38,7 +38,7 @@
         Description
       </p>
 
-      <form>
+      <form id="available_actions">
         <select id="content_types" />
         <button type="button" id="add_view">Add view</button>
         <button type="button" id="edit_view">Edit view</button>
