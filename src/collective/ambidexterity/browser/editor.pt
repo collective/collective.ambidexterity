@@ -39,10 +39,21 @@
       </p>
 
       <form>
-        <select id="content_types">
-        </select>
-        <select id="cfields">
-        </select>
+        <select id="content_types" />
+        <button type="button" id="add_view">Add view</button>
+        <button type="button" id="edit_view">Edit view</button>
+        <button type="button" id="remove_view">Remove view</button>
+        <br />
+        <select id="cfields" /><br />
+        <button type="button" id="add_default">Add default</button>
+        <button type="button" id="edit_default">Edit default</button>
+        <button type="button" id="remove_default">Remove default</button>
+        <button type="button" id="add_validator">Add validator</button>
+        <button type="button" id="edit_validator">Edit validator</button>
+        <button type="button" id="remove_validator">Remove validator</button>
+        <button type="button" id="add_vocabulary">Add vocabulary</button>
+        <button type="button" id="edit_vocabulary">Edit vocabulary</button>
+        <button type="button" id="remove_vocabulary">Remove vocabulary</button>
       </form>
 
     </div>
