@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
 
+from collective.ambidexterity import default_script
+from collective.ambidexterity import models
+from collective.ambidexterity import validator_script
+from collective.ambidexterity import vocabulary_script
+from collective.ambidexterity.utilities import getAmbidexterityScript
 from collective.ambidexterity.utilities import getResourcesInventory
 from plone.protect import CheckAuthenticator
+from plone.protect import PostOnly
 from plone.protect.utils import addTokenToUrl
 from Products.Five import BrowserView
 
@@ -38,3 +44,56 @@ class EditorAjax(BrowserView):
             'application/json'
         )
         return json.dumps(getResourcesInventory())
+
+    def button_action(self):
+        """ Respond to button clicks.
+        """
+
+        PostOnly(self.context.REQUEST)
+        CheckAuthenticator(self.request)
+
+        form = self.request.form
+        button_id = form['button_id']
+        content_type = form['content_type']
+        field_name = form['field_name']
+
+        result = {}
+
+        if button_id == 'add_default':
+            default_script.addDefaultScript(content_type, field_name)
+            models.setDefaultFactory(content_type, field_name)
+        elif button_id == 'remove_default':
+            default_script.rmDefaultScript(content_type, field_name)
+            models.removeDefaultFactory(content_type, field_name)
+        elif button_id == 'edit_default':
+            result = dict(
+                action='edit',
+                source=getAmbidexterityScript(content_type, field_name, 'default.py'),
+            )
+        elif button_id == 'add_validator':
+            validator_script.addValidatorScript(content_type, field_name)
+            models.setValidator(content_type, field_name)
+        elif button_id == 'remove_validator':
+            validator_script.rmValidatorScript(content_type, field_name)
+            models.removeValidator(content_type, field_name)
+        elif button_id == 'edit_validator':
+            result = dict(
+                action='edit',
+                source=getAmbidexterityScript(content_type, field_name, 'validate.py'),
+            )
+        elif button_id == 'add_vocabulary':
+            vocabulary_script.addVocabularyScript(content_type, field_name)
+            models.setVocabulary(content_type, field_name)
+        elif button_id == 'remove_vocabulary':
+            vocabulary_script.rmVocabularyScript(content_type, field_name)
+            models.removeVocabulary(content_type, field_name)
+        elif button_id == 'edit_vocabulary':
+            result = dict(
+                action='edit',
+                source=getAmbidexterityScript(content_type, field_name, 'vocabulary.py'),
+            )
+        self.request.RESPONSE.setHeader(
+            'Content-Type',
+            'application/json'
+        )
+        return json.dumps(result)

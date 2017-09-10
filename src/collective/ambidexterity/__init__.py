@@ -22,9 +22,9 @@ _ = MessageFactory('collective.ambidexterity')
 
 # Things we want visible at collective.ambidexterity
 
-from default import default  # NOQA
-from vocabulary import vocabulary  # NOQA
-from validator import Validator  # NOQA
+from default_script import default  # NOQA
+from vocabulary_script import vocabulary  # NOQA
+from validator_script import Validator  # NOQA
 
 
 # Alias the Validator class to validate so that we can find it at

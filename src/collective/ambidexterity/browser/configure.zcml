@@ -20,7 +20,7 @@
       class="collective.ambidexterity.browser.editor.EditorAjax"
       permission="plone.schemaeditor.ManageSchemata"
       layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
-      allowed_attributes="resource_inventory"
+      allowed_attributes="resource_inventory button_action"
       />
 
   <browser:resource

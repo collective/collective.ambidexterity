@@ -1,14 +1,33 @@
 /*globals jQuery, alert */
 
-jQuery(function($) {
+if(require === undefined){
+  // plone 4
+  require = function(reqs, torun){
+    'use strict';
+    return torun(window.jQuery);
+  };
+}
 
-    "use strict";
+if (window.jQuery && define) {
+  define( 'jquery', [], function () {
+    'use strict';
+    return window.jQuery;
+  } );
+}
+
+require([
+  'jquery',
+  'ace'
+], function($) {
+  'use strict';
 
     var inventory = null,
         content_type_select = $("#content_types"),
         fields_select = $("#cfields"),
         field_scripts = ['default', 'validator', 'vocabulary'],
-        script_operators = ['add', 'edit', 'remove'];
+        script_operators = ['add', 'edit', 'remove'],
+        editor,
+        editor_session;
 
     function get_authenticator() {
         return $('input[name="_authenticator"]').val();
@@ -49,7 +68,6 @@ jQuery(function($) {
 
     function get_inventory() {
         $.getJSON("@@ambidexterityajax/resource_inventory?_authenticator=" + get_authenticator(), function(data) {
-
             inventory = data;
             fill_content_select();
         });
@@ -66,7 +84,7 @@ jQuery(function($) {
 
         if (field_name) {
             $.each(field_scripts, function(index, value) {
-                if (field_info['have_' + value]) {
+                if (field_info['has_' + value]) {
                     $('#add_' + value).hide();
                     $('#edit_' + value).show();
                     $('#remove_' + value).show();
@@ -88,10 +106,49 @@ jQuery(function($) {
     $("form#available_actions button").click(function (e) {
         var button_id = $(this).attr('id'),
             content_type = content_type_select.val(),
-            field_name = fields_select.val();
+            field_name = fields_select.val(),
+            data_in;
 
-        alert(content_type + ' ' + field_name + ' ' + button_id);
+        data_in = {
+            "button_id": button_id,
+            "content_type": content_type,
+            "field_name": field_name
+        };
+
+        $.post("@@ambidexterityajax/button_action?_authenticator=" + get_authenticator(), data_in, function(data) {
+            editor.setValue('');
+            if (data.action === 'edit') {
+                editor.setValue(data.source);
+                editor.gotoLine(1, 1);
+            }
+            get_inventory();
+        }, 'json');
     });
+
+
+    function editor_init() {
+        if (!editor) {
+            editor = ace.edit("source_editor");
+            editor_session = editor.getSession();
+            editor.setTheme("ace/theme/monokai");
+            editor_session.setMode("ace/mode/python");
+            editor_session.setTabSize(4);
+            editor_session.setUseSoftTabs(true);
+            editor_session.setUseWrapMode(true);
+            editor.setHighlightActiveLine(false);
+        }
+    }
+
+    function setEditorSize () {
+      var wheight = $(window).height();
+      $("#source_editor").height(wheight-80);
+    }
+    $(window).resize(function() {
+      setEditorSize();
+    });
+
+    setEditorSize();
+    editor_init();
 
     get_inventory();
 
