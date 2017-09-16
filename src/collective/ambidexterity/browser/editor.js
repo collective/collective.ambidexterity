@@ -24,10 +24,12 @@ require([
     var inventory = null,
         content_type_select = $("#content_types"),
         fields_select = $("#cfields"),
+        save_form = $("#saveform"),
         field_scripts = ['default', 'validator', 'vocabulary'],
         script_operators = ['add', 'edit', 'remove'],
         editor,
-        editor_session;
+        editor_session,
+        doc_changed;
 
     function get_authenticator() {
         return $('input[name="_authenticator"]').val();
@@ -118,8 +120,10 @@ require([
         $.post("@@ambidexterityajax/button_action?_authenticator=" + get_authenticator(), data_in, function(data) {
             editor.setValue('');
             if (data.action === 'edit') {
-                editor.setValue(data.source);
-                editor.gotoLine(1, 1);
+                editor_set_source(data.source);
+                save_form.children("input[name='content_type']").val(content_type);
+                save_form.children("input[name='field_name']").val(field_name);
+                save_form.children("input[name='script']").val(button_id);
             }
             get_inventory();
         }, 'json');
@@ -128,6 +132,14 @@ require([
 
     function editor_init() {
         if (!editor) {
+            if (!window.ace){
+                // XXX hack...
+                // wait, try loading later
+                setTimeout(function() {
+                  editor_init();
+                }, 200);
+                return;
+            }
             editor = ace.edit("source_editor");
             editor_session = editor.getSession();
             editor.setTheme("ace/theme/monokai");
@@ -136,8 +148,32 @@ require([
             editor_session.setUseSoftTabs(true);
             editor_session.setUseWrapMode(true);
             editor.setHighlightActiveLine(false);
+
+            // Make save keystroke trigger save-form submit
+            editor.commands.addCommand({
+                name: "save",
+                bindKey: {win: "Ctrl-S", mac: "Command-S"},
+                exec: function() {
+                    save_form.submit();
+                }
+            });
+
+            // enable save submit button on change
+            editor_session.on('change', function(e) {
+                $('#saveform :submit').removeAttr('disabled');
+                doc_changed = true;
+            });
         }
     }
+
+
+    function editor_set_source(source) {
+        editor.setValue(source);
+        editor.gotoLine(1, 1);
+        doc_changed = false;
+        $('#saveform :submit').attr('disabled', 'disabled');
+    }
+
 
     function setEditorSize () {
       var wheight = $(window).height();

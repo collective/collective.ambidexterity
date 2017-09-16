@@ -9,7 +9,26 @@
 <head>
 
   <metal:styleslot define-slot="style_slot">
-    CSS SLOT
+<style>
+#content {
+    margin-bottom: 20px;
+}
+#source_editor {
+    right: 1px;
+    left: 1px;
+    z-index: 1;
+    border: 1px solid #ccc;
+}
+.portalMessage {
+    float: right;
+    font-size: 200%;
+    color: #fff;
+}
+.portalMessage span {
+    background-color: #0a0;
+    padding: 0.5em;
+}
+</style>
   </metal:styleslot>
 
   <metal:javascriptslot fill-slot="javascript_head_slot">
@@ -53,15 +72,34 @@
         <button type="button" id="add_default">Add default</button>
         <button type="button" id="edit_default">Edit default</button>
         <button type="button" id="remove_default">Remove default</button>
+        &nbsp; &nbsp;
         <button type="button" id="add_validator">Add validator</button>
         <button type="button" id="edit_validator">Edit validator</button>
         <button type="button" id="remove_validator">Remove validator</button>
+        &nbsp; &nbsp;
         <button type="button" id="add_vocabulary">Add vocabulary</button>
         <button type="button" id="edit_vocabulary">Edit vocabulary</button>
         <button type="button" id="remove_vocabulary">Remove vocabulary</button>
       </form>
 
     </div>
+
+    <div class="portalMessage info">
+      <span id="messagespan" style="display:none">
+        &nbsp;
+      </span>&nbsp;
+    </div>
+
+    <form id="saveform">
+      <input tal:replace="structure context/@@authenticator/authenticator" />
+      <input type="hidden" name="content_type" value="" />
+      <input type="hidden" name="field_name" value="" />
+      <input type="hidden" name="script" value="" />
+      <div class="formControls">
+        <input class="context" type="submit" name="form.button.save" value="Save" disabled="disabled" />
+      </div>
+    </form>
+
 
     <div id="source_editor" style="margin: 2em 0" />
 
