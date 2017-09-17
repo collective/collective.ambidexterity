@@ -28,7 +28,6 @@ require([
         field_scripts = ['default', 'validator', 'vocabulary'],
         script_operators = ['add', 'edit', 'remove'],
         editor,
-        editor_session,
         doc_changed;
 
     function get_authenticator() {
@@ -132,6 +131,8 @@ require([
 
     function editor_init() {
         if (!editor) {
+            var editor_session;
+
             if (!window.ace){
                 // XXX hack...
                 // wait, try loading later
@@ -141,13 +142,13 @@ require([
                 return;
             }
             editor = ace.edit("source_editor");
+            // editor.setTheme("ace/theme/monokai");
+            editor.setHighlightActiveLine(false);
             editor_session = editor.getSession();
-            editor.setTheme("ace/theme/monokai");
-            editor_session.setMode("ace/mode/python");
+            // editor_session.setMode("ace/mode/python");
             editor_session.setTabSize(4);
             editor_session.setUseSoftTabs(true);
             editor_session.setUseWrapMode(true);
-            editor.setHighlightActiveLine(false);
 
             // Make save keystroke trigger save-form submit
             editor.commands.addCommand({
@@ -168,8 +169,16 @@ require([
 
 
     function editor_set_source(source) {
-        editor.setValue(source);
+        var editor_session = editor.getSession();
+
+        editor_session.setValue(source);
         editor.gotoLine(1, 1);
+        if (source.endsWith('.pt')) {
+            editor_session.setMode("ace/mode/html");
+        } else {
+            editor_session.setMode("ace/mode/python");
+        }
+//        editor_session.getUndoManager().reset();
         doc_changed = false;
         $('#saveform :submit').attr('disabled', 'disabled');
     }
@@ -179,9 +188,9 @@ require([
       var wheight = $(window).height();
       $("#source_editor").height(wheight-80);
     }
-    $(window).resize(function() {
-      setEditorSize();
-    });
+    // $(window).resize(function() {
+    //   setEditorSize();
+    // });
 
     setEditorSize();
     editor_init();
