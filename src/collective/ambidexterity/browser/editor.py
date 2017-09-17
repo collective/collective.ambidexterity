@@ -97,3 +97,34 @@ class EditorAjax(BrowserView):
             'application/json'
         )
         return json.dumps(result)
+
+    def save_action(self):
+        """ Save a script.
+        """
+
+        PostOnly(self.context.REQUEST)
+        CheckAuthenticator(self.request)
+
+        form = self.request.form
+        content_type = form['content_type']
+        field_name = form['field_name']
+        script = form['script']
+        body = form['data']
+
+        result = 'failure'
+        if script == 'edit_default':
+            default_script.updateDefaultScript(content_type, field_name, body)
+            result = 'success'
+        elif script == 'edit_validator':
+            validator_script.updateValidatorScript(content_type, field_name, body)
+            result = 'success'
+        elif script == 'edit_vocabulary':
+            vocabulary_script.updateVocabularyScript(content_type, field_name, body)
+            result = 'success'
+
+        result = dict(result=result)
+        self.request.RESPONSE.setHeader(
+            'Content-Type',
+            'application/json'
+        )
+        return json.dumps(result)

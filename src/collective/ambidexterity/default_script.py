@@ -14,6 +14,7 @@
 
 
 from interpreter import AmbidexterityProgram
+from Products.CMFPlone.utils import safe_unicode
 from utilities import addFieldScript
 from utilities import getAmbidexterityScript
 from utilities import getFrameLocal
@@ -23,11 +24,12 @@ from zope.interface import provider
 from zope.schema.interfaces import IContextAwareDefaultFactory
 
 import inspect
+import types
 
 DEFAULT_SCRIPT = """# Default script.
 # Use this to set the default for a Dexterity content-type field.
 # This script will be executed in a RestrictedPython environment.
-# local variables available to you:
+# Local variables available to you:
 #     context -- the folder in which the item is being added.
 # Set your default by assigning it to "default".
 # The value you set must match the field type.
@@ -47,7 +49,12 @@ def default(context):
     ctype_name = field.interface.getName()
     script = getAmbidexterityScript(ctype_name, field_name, 'default.py')
     cp = AmbidexterityProgram(script)
-    return cp.execute(dict(context=context))['default']
+    result = cp.execute(dict(context=context))['default']
+    if type(result) is types.StringType:
+        # fix a likely common error in script returns
+        return safe_unicode(result)
+    else:
+        return result
 
 
 def addDefaultScript(ctype_name, field_name):

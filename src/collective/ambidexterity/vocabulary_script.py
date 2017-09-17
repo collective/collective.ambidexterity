@@ -23,14 +23,15 @@ from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary
 
 import inspect
+import types
 
 VOCABULARY_SCRIPT = """# Vocabulary script.
 # Use this to set the default for a Dexterity content-type field.
 # This script will be executed in a RestrictedPython environment.
-# local variables available to you:
+# Local variables available to you:
 #     context -- the folder in which the item is being added.
 # Set your vocabulary by assigning it to "vocabulary".
-# It should be a list of values or a list of (value, token) items.
+# It should be a list of values or a list of (title, value) items.
 
 vocabulary = []
 """
@@ -49,7 +50,7 @@ def vocabulary(context):
     cp_globals = dict(context=context)
     result = cp.execute(cp_globals)['vocabulary']
     if len(result) > 0:
-        if len(result[0]) == 1:
+        if type(result[0]) not in (types.ListType, types.TupleType):
             return SimpleVocabulary.fromValues(result)
         elif len(result[0]) == 2:
             return SimpleVocabulary.fromItems(result)
