@@ -129,6 +129,16 @@ require([
     });
 
 
+    save_form.submit(function (e) {
+        e.preventDefault();
+
+        // TODO: save me!
+        enable_actions();
+        doc_changed = false;
+        $('#save_form :submit').attr('disabled', 'disabled');
+    });
+
+
     function editor_init() {
         if (!editor) {
             var editor_session;
@@ -162,9 +172,20 @@ require([
             // enable save submit button on change
             editor_session.on('change', function(e) {
                 $('#saveform :submit').removeAttr('disabled');
+                disable_actions();
                 doc_changed = true;
             });
         }
+    }
+
+
+    function disable_actions() {
+        $("#available_actions :input").attr('disabled', 'disabled');
+    }
+
+
+    function enable_actions() {
+        $("#available_actions :input").removeAttr('disabled');
     }
 
 
@@ -188,9 +209,6 @@ require([
       var wheight = $(window).height();
       $("#source_editor").height(wheight-80);
     }
-    // $(window).resize(function() {
-    //   setEditorSize();
-    // });
 
     setEditorSize();
     editor_init();
