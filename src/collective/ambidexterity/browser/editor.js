@@ -1,5 +1,8 @@
 /*globals jQuery, alert */
 
+// TODO: save and abandon need to be buttons in a single form.
+
+
 if(require === undefined){
   // plone 4
   require = function(reqs, torun){
@@ -25,6 +28,7 @@ require([
         content_type_select = $("#content_types"),
         fields_select = $("#cfields"),
         save_form = $("#saveform"),
+        abandon_form = $("#abandonform"),
         field_scripts = ['default', 'validator', 'vocabulary'],
         script_operators = ['add', 'edit', 'remove'],
         editor,
@@ -150,12 +154,23 @@ require([
                 if (data.result === 'success') {
                     enable_actions();
                     doc_changed = false;
-                    $('#save_form :submit').attr('disabled', 'disabled');
+                    $('#saveform :submit').attr('disabled', 'disabled');
+                    $('#abandonform :submit').attr('disabled', 'disabled');
                 } else {
                     alert("Save failed.");
                 }
             }, 'json');
         });
+
+
+        abandon_form.submit(function (e) {
+            // TODO: add confirm
+
+            e.preventDefault();
+            editor_set_source('');
+            enable_actions();
+        });
+
     } // init_events
 
 
@@ -192,6 +207,7 @@ require([
             // enable save submit button on change
             editor_session.on('change', function(e) {
                 $('#saveform :submit').removeAttr('disabled');
+                $('#abandonform :submit').removeAttr('disabled');
                 disable_actions();
                 doc_changed = true;
             });
@@ -221,6 +237,7 @@ require([
         }
         doc_changed = false;
         $('#saveform :submit').attr('disabled', 'disabled');
+        $('#abandonform :submit').attr('disabled', 'disabled');
     }
 
 

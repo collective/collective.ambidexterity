@@ -99,6 +99,11 @@
         <input class="context" type="submit" name="form.button.save" value="Save" disabled="disabled" />
       </div>
     </form>
+    <form id="abandonform">
+      <div class="formControls">
+        <input class="context" type="submit" name="form.button.save" value="Abandon changes" disabled="disabled" />
+      </div>
+    </form>
 
 
     <div id="source_editor" style="margin: 2em 0" />
