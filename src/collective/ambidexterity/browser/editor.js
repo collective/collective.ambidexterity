@@ -1,28 +1,28 @@
-/*globals jQuery, alert */
+/*globals window, jQuery, require, define, alert, setTimeout, ace */
 
 // TODO: save and abandon need to be buttons in a single form.
 
 
-if(require === undefined){
-  // plone 4
-  require = function(reqs, torun){
-    'use strict';
-    return torun(window.jQuery);
-  };
+if (require === undefined) {
+    // plone 4
+    require = function (reqs, torun) {
+        'use strict';
+        return torun(window.jQuery);
+    };
 }
 
 if (window.jQuery && define) {
-  define( 'jquery', [], function () {
-    'use strict';
-    return window.jQuery;
-  } );
+    define('jquery', [], function () {
+        'use strict';
+        return window.jQuery;
+    });
 }
 
 require([
-  'jquery',
-  'ace'
+    'jquery',
+    'ace'
 ], function($) {
-  'use strict';
+    'use strict';
 
     var inventory = null,
         content_type_select = $("#content_types"),
@@ -30,7 +30,6 @@ require([
         save_form = $("#saveform"),
         abandon_form = $("#abandonform"),
         field_scripts = ['default', 'validator', 'vocabulary'],
-        script_operators = ['add', 'edit', 'remove'],
         editor,
         doc_changed;
 
@@ -80,6 +79,32 @@ require([
             inventory = data;
             fill_content_select();
         });
+    }
+
+
+    function disable_actions() {
+        $("#available_actions :input").attr('disabled', 'disabled');
+    }
+
+
+    function enable_actions() {
+        $("#available_actions :input").removeAttr('disabled');
+    }
+
+
+    function editor_set_source(source) {
+        var editor_session = editor.getSession();
+
+        editor_session.setValue(source);
+        editor.gotoLine(1, 1);
+        if (source.endsWith('.pt')) {
+            editor_session.setMode("ace/mode/html");
+        } else {
+            editor_session.setMode("ace/mode/python");
+        }
+        doc_changed = false;
+        $('#saveform :submit').attr('disabled', 'disabled');
+        $('#abandonform :submit').attr('disabled', 'disabled');
     }
 
 
@@ -178,11 +203,11 @@ require([
         if (!editor) {
             var editor_session;
 
-            if (!window.ace){
+            if (!window.ace) {
                 // XXX hack...
                 // wait, try loading later
-                setTimeout(function() {
-                  editor_init();
+                setTimeout(function () {
+                    editor_init();
                 }, 200);
                 return;
             }
@@ -215,35 +240,9 @@ require([
     } // editor_init
 
 
-    function disable_actions() {
-        $("#available_actions :input").attr('disabled', 'disabled');
-    }
-
-
-    function enable_actions() {
-        $("#available_actions :input").removeAttr('disabled');
-    }
-
-
-    function editor_set_source(source) {
-        var editor_session = editor.getSession();
-
-        editor_session.setValue(source);
-        editor.gotoLine(1, 1);
-        if (source.endsWith('.pt')) {
-            editor_session.setMode("ace/mode/html");
-        } else {
-            editor_session.setMode("ace/mode/python");
-        }
-        doc_changed = false;
-        $('#saveform :submit').attr('disabled', 'disabled');
-        $('#abandonform :submit').attr('disabled', 'disabled');
-    }
-
-
-    function setEditorSize () {
-      var wheight = $(window).height();
-      $("#source_editor").height(wheight-80);
+    function setEditorSize() {
+        var wheight = $(window).height();
+        $("#source_editor").height(wheight - 400);
     }
 
 
