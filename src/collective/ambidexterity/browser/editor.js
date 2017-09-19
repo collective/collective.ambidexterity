@@ -97,14 +97,17 @@ require([
 
         editor_session.setValue(source);
         editor.gotoLine(1, 1);
-        if (source.endsWith('.pt')) {
+        if (source.trim().startsWith('<')) {
             editor_session.setMode("ace/mode/html");
         } else {
             editor_session.setMode("ace/mode/python");
         }
         doc_changed = false;
+        // Changing the source will have generated a change event,
+        // so we need to fix our buttons.
         $('#saveform :submit').attr('disabled', 'disabled');
         $('#abandonform :submit').attr('disabled', 'disabled');
+        enable_actions();
     }
 
 
@@ -117,6 +120,16 @@ require([
             var content_type = content_type_select.val(),
                 field_name = fields_select.val(),
                 field_info = inventory[content_type].fields[field_name];
+
+            if (inventory[content_type].has_view) {
+                $('#add_view').hide();
+                $('#edit_view').show();
+                $('#remove_view').show();
+            } else {
+                $('#add_view').show();
+                $('#edit_view').hide();
+                $('#remove_view').hide();
+            }
 
             if (field_name) {
                 $.each(field_scripts, function(index, value) {

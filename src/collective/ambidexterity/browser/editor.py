@@ -4,6 +4,7 @@ from collective.ambidexterity import default_script
 from collective.ambidexterity import models
 from collective.ambidexterity import validator_script
 from collective.ambidexterity import vocabulary_script
+from collective.ambidexterity import view as ad_view
 from collective.ambidexterity.utilities import getAmbidexterityFile
 from collective.ambidexterity.utilities import getResourcesInventory
 from plone.protect import CheckAuthenticator
@@ -92,6 +93,18 @@ class EditorAjax(BrowserView):
                 action='edit',
                 source=getAmbidexterityFile(content_type, field_name, 'vocabulary.py'),
             )
+        elif button_id == 'add_view':
+            ad_view.addViewTemplate(content_type)
+            models.setAmbidexterityView(content_type)
+        elif button_id == 'edit_view':
+            result = dict(
+                action='edit',
+                source=getAmbidexterityFile(content_type, None, 'view.pt'),
+            )
+        elif button_id == 'remove_view':
+            ad_view.rmViewTemplate(content_type)
+            models.removeAmbidexterityView(content_type)
+
         self.request.RESPONSE.setHeader(
             'Content-Type',
             'application/json'
