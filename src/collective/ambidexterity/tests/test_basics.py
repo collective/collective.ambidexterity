@@ -173,6 +173,7 @@ class TestSetup(unittest.TestCase):
                     }
                 },
                 'has_model_source': True,
-                'title': 'Simple Test Type'
+                'title': 'Simple Test Type',
+                'has_view': True,
             },
         })

@@ -66,12 +66,15 @@ def getResourcesInventory():
             title=fti.title,
             fields={},
             has_model_source=getattr(fti, 'model_source', None) is not None,
+            has_view=False,
         )
+        if ambidexterity_folder is None:
+            type_folder = None
+        else:
+            type_folder = ambidexterity_folder.get(fid)
+        if type_folder is not None and type_folder.get('view.pt') is not None:
+            content_type['has_view'] = True
         if content_type['has_model_source']:
-            if ambidexterity_folder is None:
-                type_folder = None
-            else:
-                type_folder = ambidexterity_folder.get(fid)
             for field, title in models.getFieldList(fid):
                 if type_folder is not None:
                     field_folder = type_folder.get(field)
