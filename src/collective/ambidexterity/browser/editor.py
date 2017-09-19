@@ -134,6 +134,9 @@ class EditorAjax(BrowserView):
         elif script == 'edit_vocabulary':
             vocabulary_script.updateVocabularyScript(content_type, field_name, body)
             result = 'success'
+        elif script == 'edit_view':
+            ad_view.updateViewTemplate(content_type, body)
+            result = 'success'
 
         result = dict(result=result)
         self.request.RESPONSE.setHeader(

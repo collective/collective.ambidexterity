@@ -89,21 +89,15 @@
 
     </div>
 
-    <form id="saveform">
+    <form id="dataform">
+      <!-- A place to save data we may need -->
       <input tal:replace="structure context/@@authenticator/authenticator" />
       <input type="hidden" name="content_type" value="" />
       <input type="hidden" name="field_name" value="" />
       <input type="hidden" name="script" value="" />
-      <div class="formControls">
-        <input class="context" type="submit" name="form.button.save" value="Save" disabled="disabled" />
-      </div>
+      <input class="plone-btn" type="submit" id="save_edits" value="Save changes" disabled="disabled" />
+      <input class="plone-btn plone-btn-danger" type="cancel" id="abandon_edits" value="Abandon changes" disabled="disabled" />
     </form>
-    <form id="abandonform">
-      <div class="formControls">
-        <input class="context" type="submit" name="form.button.save" value="Abandon changes" disabled="disabled" />
-      </div>
-    </form>
-
 
     <div id="source_editor" style="margin: 2em 0" />
 

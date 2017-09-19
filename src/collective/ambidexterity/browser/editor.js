@@ -27,8 +27,9 @@ require([
     var inventory = null,
         content_type_select = $("#content_types"),
         fields_select = $("#cfields"),
-        save_form = $("#saveform"),
-        abandon_form = $("#abandonform"),
+        data_form = $("#dataform"),
+        abandon_button = $("#abandon_edits"),
+        save_button = $("#save_edits"),
         field_scripts = ['default', 'validator', 'vocabulary'],
         editor,
         doc_changed;
@@ -105,22 +106,17 @@ require([
         doc_changed = false;
         // Changing the source will have generated a change event,
         // so we need to fix our buttons.
-        $('#saveform :submit').attr('disabled', 'disabled');
-        $('#abandonform :submit').attr('disabled', 'disabled');
+        save_button.attr('disabled', 'disabled');
+        abandon_button.attr('disabled', 'disabled');
         enable_actions();
     }
 
 
     function init_events() {
         content_type_select.change(function () {
-            fill_fields(content_type_select.val());
-        });
+            var content_type = content_type_select.val();
 
-        fields_select.change(function () {
-            var content_type = content_type_select.val(),
-                field_name = fields_select.val(),
-                field_info = inventory[content_type].fields[field_name];
-
+            fill_fields(content_type);
             if (inventory[content_type].has_view) {
                 $('#add_view').hide();
                 $('#edit_view').show();
@@ -130,6 +126,12 @@ require([
                 $('#edit_view').hide();
                 $('#remove_view').hide();
             }
+        });
+
+        fields_select.change(function () {
+            var content_type = content_type_select.val(),
+                field_name = fields_select.val(),
+                field_info = inventory[content_type].fields[field_name];
 
             if (field_name) {
                 $.each(field_scripts, function(index, value) {
@@ -168,32 +170,31 @@ require([
                 editor.setValue('');
                 if (data.action === 'edit') {
                     editor_set_source(data.source);
-                    save_form.children("input[name='content_type']").val(content_type);
-                    save_form.children("input[name='field_name']").val(field_name);
-                    save_form.children("input[name='script']").val(button_id);
+                    data_form.children("input[name='content_type']").val(content_type);
+                    data_form.children("input[name='field_name']").val(field_name);
+                    data_form.children("input[name='script']").val(button_id);
                 }
                 get_inventory();
             }, 'json');
         });
 
 
-        save_form.submit(function (e) {
+        save_button.click(function (e) {
             var data_in = {
-                content_type: save_form.children("input[name='content_type']").val(),
-                field_name: save_form.children("input[name='field_name']").val(),
-                script: save_form.children("input[name='script']").val(),
+                content_type: data_form.children("input[name='content_type']").val(),
+                field_name: data_form.children("input[name='field_name']").val(),
+                script: data_form.children("input[name='script']").val(),
                 data: editor.getValue(),
                 save_action: "_authenticator=" + get_authenticator()
             };
 
             e.preventDefault();
             $.post("@@ambidexterityajax/save_action", data_in, function(data) {
-                editor.setValue('');
                 if (data.result === 'success') {
                     enable_actions();
                     doc_changed = false;
-                    $('#saveform :submit').attr('disabled', 'disabled');
-                    $('#abandonform :submit').attr('disabled', 'disabled');
+                    save_button.attr('disabled', 'disabled');
+                    abandon_button.attr('disabled', 'disabled');
                 } else {
                     alert("Save failed.");
                 }
@@ -201,14 +202,19 @@ require([
         });
 
 
-        abandon_form.submit(function (e) {
-            // TODO: add confirm
-
+        abandon_button.click(function (e) {
             e.preventDefault();
-            editor_set_source('');
-            enable_actions();
+            if (window.confirm("Do you wish to abandon changes?")) {
+                editor_set_source('');
+                enable_actions();
+            }
         });
 
+
+        data_form.submit(function (e) {
+            e.preventDefault();
+            alert("onSubmit for data_form");
+        });
     } // init_events
 
 
@@ -225,6 +231,7 @@ require([
                 return;
             }
             editor = ace.edit("source_editor");
+            editor.$blockScrolling = Infinity;
             // editor.setTheme("ace/theme/monokai");
             editor.setHighlightActiveLine(false);
             editor_session = editor.getSession();
@@ -238,14 +245,14 @@ require([
                 name: "save",
                 bindKey: {win: "Ctrl-S", mac: "Command-S"},
                 exec: function() {
-                    save_form.submit();
+                    save_button.click();
                 }
             });
 
             // enable save submit button on change
             editor_session.on('change', function(e) {
-                $('#saveform :submit').removeAttr('disabled');
-                $('#abandonform :submit').removeAttr('disabled');
+                save_button.removeAttr('disabled');
+                abandon_button.removeAttr('disabled');
                 disable_actions();
                 doc_changed = true;
             });
