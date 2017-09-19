@@ -71,6 +71,7 @@ require([
             selected = content_type_select.children().eq(0).val();
         }
         content_type_select.val(selected);
+        content_type_select.change();
         fill_fields(selected);
     }
 
@@ -170,6 +171,9 @@ require([
                 editor.setValue('');
                 if (data.action === 'edit') {
                     editor_set_source(data.source);
+                    data_form.children("#edit-label").text(
+                        'Editing ' + button_id.replace('edit_', '') + ' for ' + content_type + '/' + field_name
+                    );
                     data_form.children("input[name='content_type']").val(content_type);
                     data_form.children("input[name='field_name']").val(field_name);
                     data_form.children("input[name='script']").val(button_id);
@@ -266,8 +270,8 @@ require([
     }
 
 
+    editor_init();
     get_inventory();
     setEditorSize();
-    editor_init();
     init_events();
 });

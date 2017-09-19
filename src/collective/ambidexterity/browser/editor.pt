@@ -8,7 +8,7 @@
 
 <head>
 
-  <metal:styleslot define-slot="style_slot">
+  <metal:styleslot fill-slot="style_slot">
 <style>
 #content {
     margin-bottom: 20px;
@@ -19,14 +19,17 @@
     z-index: 1;
     border: 1px solid #ccc;
 }
-.portalMessage {
-    float: right;
-    font-size: 200%;
-    color: #fff;
+div.plone-btn-group {
+  margin: 0.25em 0;
 }
-.portalMessage span {
-    background-color: #0a0;
-    padding: 0.5em;
+div.plone-btn-group {
+  margin: 0.75em 0;
+}
+span.btn-label {
+    font-weight: bold;
+    display: inline-block;
+    width: 7%;
+    text-align: right;
 }
 </style>
   </metal:styleslot>
@@ -63,24 +66,24 @@
       </p>
 
       <form id="available_actions">
-        Content types: <select id="content_types" />
-        Fields: <select id="cfields" /><br />
+        <strong>Content types:</strong> <select id="content_types" />
+        <strong>Fields:</strong> <select id="cfields" /><br />
         <div class="plone-btn-group">
-          View:
+          <span class="btn-label">View:</span>
           <button class="plone-btn" type="button" id="add_view">Add view</button>
           <button class="plone-btn" type="button" id="edit_view">Edit view</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_view">Remove view</button>
         </div>
         <div class="plone-btn-group">
-          Scripts:
+          <span class="btn-label">Scripts:</span>
           <button class="plone-btn" type="button" id="add_default">Add default</button>
           <button class="plone-btn" type="button" id="edit_default">Edit default</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_default">Remove default</button>
-          &nbsp; &nbsp;
+          &#160; &#160;
           <button class="plone-btn" type="button" id="add_validator">Add validator</button>
           <button class="plone-btn" type="button" id="edit_validator">Edit validator</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_validator">Remove validator</button>
-          &nbsp; &nbsp;
+          &#160; &#160;
           <button class="plone-btn" type="button" id="add_vocabulary">Add vocabulary</button>
           <button class="plone-btn" type="button" id="edit_vocabulary">Edit vocabulary</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_vocabulary">Remove vocabulary</button>
@@ -89,8 +92,9 @@
 
     </div>
 
-    <form id="dataform">
+    <form id="dataform" class="plone-btn-group">
       <!-- A place to save data we may need -->
+      <span id="edit-label" />
       <input tal:replace="structure context/@@authenticator/authenticator" />
       <input type="hidden" name="content_type" value="" />
       <input type="hidden" name="field_name" value="" />
