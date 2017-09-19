@@ -91,3 +91,16 @@ class TestSetup(unittest.TestCase):
         models.setValidator('simple_test_type', 'test_string_field')
         s = models.getModelSource('simple_test_type')
         self.assertIn('form:validator="collective.ambidexterity.validate"', s)
+
+    def test_removeView(self):
+        models.removeAmbidexterityView('simple_test_type')
+        dfti = self.portal.portal_types.simple_test_type
+        self.assertEqual(dfti.view_methods, ('view', ))
+        self.assertEqual(dfti.default_view, 'view')
+
+    def test_addView(self):
+        models.removeAmbidexterityView('simple_test_type')
+        models.setAmbidexterityView('simple_test_type')
+        dfti = self.portal.portal_types.simple_test_type
+        self.assertEqual(dfti.default_view, models.AMBIDEXTERITY_VIEW)
+        self.assertEqual(dfti.view_methods, (models.AMBIDEXTERITY_VIEW, 'view'))

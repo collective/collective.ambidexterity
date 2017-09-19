@@ -9,6 +9,7 @@ import utilities
 
 import re
 
+AMBIDEXTERITY_VIEW = '@@ambidexterityview'
 SCHEMA_NAMESPACE = 'http://namespaces.plone.org/supermodel/schema'
 FORM_NAMESPACE = 'http://namespaces.plone.org/supermodel/form'
 
@@ -180,4 +181,24 @@ def setValidator(id, field_name):
 
 def setAmbidexterityView(id):
     fti = getFTI(id)
-    fti.manage_changeProperties(view_methods=['@@ambidexterityview', ])
+    view_methods = list(fti.view_methods)
+    if AMBIDEXTERITY_VIEW not in view_methods:
+        view_methods.insert(0, AMBIDEXTERITY_VIEW)
+        fti.manage_changeProperties(view_methods=tuple(view_methods))
+    fti.manage_changeProperties(default_view=AMBIDEXTERITY_VIEW)
+
+
+def removeAmbidexterityView(id):
+    fti = getFTI(id)
+    view_methods = list(fti.view_methods)
+    if len(view_methods) == 0 and AMBIDEXTERITY_VIEW in view_methods:
+        # We need to make sure there is a fallback view
+        # before we make other changes
+        view_methods.append('view')
+        fti.manage_changeProperties(view_methods=tuple(view_methods))
+    view_methods.remove(AMBIDEXTERITY_VIEW)
+    default_view = view_methods[0]
+    # Note that the order of operations below is important;
+    # the default_view must always be in the view methods.
+    fti.manage_changeProperties(default_view=default_view)
+    fti.manage_changeProperties(view_methods=tuple(view_methods))
