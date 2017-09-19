@@ -4,7 +4,7 @@ from collective.ambidexterity import default_script
 from collective.ambidexterity import models
 from collective.ambidexterity import validator_script
 from collective.ambidexterity import vocabulary_script
-from collective.ambidexterity.utilities import getAmbidexterityScript
+from collective.ambidexterity.utilities import getAmbidexterityFile
 from collective.ambidexterity.utilities import getResourcesInventory
 from plone.protect import CheckAuthenticator
 from plone.protect import PostOnly
@@ -68,7 +68,7 @@ class EditorAjax(BrowserView):
         elif button_id == 'edit_default':
             result = dict(
                 action='edit',
-                source=getAmbidexterityScript(content_type, field_name, 'default.py'),
+                source=getAmbidexterityFile(content_type, field_name, 'default.py'),
             )
         elif button_id == 'add_validator':
             validator_script.addValidatorScript(content_type, field_name)
@@ -79,7 +79,7 @@ class EditorAjax(BrowserView):
         elif button_id == 'edit_validator':
             result = dict(
                 action='edit',
-                source=getAmbidexterityScript(content_type, field_name, 'validate.py'),
+                source=getAmbidexterityFile(content_type, field_name, 'validate.py'),
             )
         elif button_id == 'add_vocabulary':
             vocabulary_script.addVocabularyScript(content_type, field_name)
@@ -90,7 +90,7 @@ class EditorAjax(BrowserView):
         elif button_id == 'edit_vocabulary':
             result = dict(
                 action='edit',
-                source=getAmbidexterityScript(content_type, field_name, 'vocabulary.py'),
+                source=getAmbidexterityFile(content_type, field_name, 'vocabulary.py'),
             )
         self.request.RESPONSE.setHeader(
             'Content-Type',

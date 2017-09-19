@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     Supply a Dexterity context source binder vocabulary from a Python script
-    found via getAmbidexterityScript and executed via
+    found via getAmbidexterityFile and executed via
     AmbidexterityProgram.
 
     The script is given one value (other than standard builtins):
@@ -14,7 +14,7 @@
 
 from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
-from utilities import getAmbidexterityScript
+from utilities import getAmbidexterityFile
 from utilities import getFrameLocal
 from utilities import rmFieldScript
 from utilities import updateFieldScript
@@ -45,7 +45,7 @@ def vocabulary(context):
     field = getFrameLocal(stack, 1, 'self')
     field_name = field.getName()
     ctype_name = field.interface.getName()
-    script = getAmbidexterityScript(ctype_name, field_name, 'vocabulary.py')
+    script = getAmbidexterityFile(ctype_name, field_name, 'vocabulary.py')
     cp = AmbidexterityProgram(script)
     cp_globals = dict(context=context)
     result = cp.execute(cp_globals)['vocabulary']

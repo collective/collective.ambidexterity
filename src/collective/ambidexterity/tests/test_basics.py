@@ -105,6 +105,10 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(type(vocab), type(SimpleVocabulary.fromItems([])))
         self.assertEqual([s.value for s in vocab], [u'a', u'b', u'c'])
 
+    def test_get_view_file(self):
+        pt = utilities.getAmbidexterityFile('simple_test_type', None, 'view.pt')
+        self.assertEqual('view.pt for <span tal:replace="context/id" />', pt)
+
     def test_default_view(self):
         # make sure we're returning the ambidexterity view when implemented.
         # First, create an item that we can traverse.

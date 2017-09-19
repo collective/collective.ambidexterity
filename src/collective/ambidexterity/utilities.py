@@ -24,11 +24,14 @@ def demunge(s):
     return plone_munge.sub('', s)
 
 
-def getAmbidexterityScript(ctype_name, field_name, id):
+def getAmbidexterityFile(ctype_name, field_name, id):
     # ctype_name is from an interface, so it's been munged.
     # Return the body of a text file in portal_resources/ambidexterity/content_type/field/id
     pr = api.portal.get_tool(name='portal_resources')
-    path = '/'.join(('ambidexterity', demunge(ctype_name), field_name, id))
+    if field_name is None:
+        path = '/'.join(('ambidexterity', demunge(ctype_name), id))
+    else:
+        path = '/'.join(('ambidexterity', demunge(ctype_name), field_name, id))
     # TODO: give a meaningful message if we can't find the script
     return pr.restrictedTraverse(path).data
 

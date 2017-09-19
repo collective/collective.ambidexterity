@@ -63,31 +63,30 @@
       </p>
 
       <form id="available_actions">
-        <select id="content_types" />
-        <button type="button" id="add_view">Add view</button>
-        <button type="button" id="edit_view">Edit view</button>
-        <button type="button" id="remove_view">Remove view</button>
-        <br />
-        <select id="cfields" /><br />
-        <button type="button" id="add_default">Add default</button>
-        <button type="button" id="edit_default">Edit default</button>
-        <button type="button" id="remove_default">Remove default</button>
-        &nbsp; &nbsp;
-        <button type="button" id="add_validator">Add validator</button>
-        <button type="button" id="edit_validator">Edit validator</button>
-        <button type="button" id="remove_validator">Remove validator</button>
-        &nbsp; &nbsp;
-        <button type="button" id="add_vocabulary">Add vocabulary</button>
-        <button type="button" id="edit_vocabulary">Edit vocabulary</button>
-        <button type="button" id="remove_vocabulary">Remove vocabulary</button>
+        Content types: <select id="content_types" />
+        Fields: <select id="cfields" /><br />
+        <div class="plone-btn-group">
+          View:
+          <button class="plone-btn" type="button" id="add_view">Add view</button>
+          <button class="plone-btn" type="button" id="edit_view">Edit view</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_view">Remove view</button>
+        </div>
+        <div class="plone-btn-group">
+          Scripts:
+          <button class="plone-btn" type="button" id="add_default">Add default</button>
+          <button class="plone-btn" type="button" id="edit_default">Edit default</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_default">Remove default</button>
+          &nbsp; &nbsp;
+          <button class="plone-btn" type="button" id="add_validator">Add validator</button>
+          <button class="plone-btn" type="button" id="edit_validator">Edit validator</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_validator">Remove validator</button>
+          &nbsp; &nbsp;
+          <button class="plone-btn" type="button" id="add_vocabulary">Add vocabulary</button>
+          <button class="plone-btn" type="button" id="edit_vocabulary">Edit vocabulary</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_vocabulary">Remove vocabulary</button>
+        </div>
       </form>
 
-    </div>
-
-    <div class="portalMessage info">
-      <span id="messagespan" style="display:none">
-        &nbsp;
-      </span>&nbsp;
     </div>
 
     <form id="saveform">

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     Supply a z3c.form field validator from a Python script
-    found via getAmbidexterityScript and executed via
+    found via getAmbidexterityFile and executed via
     AmbidexterityProgram.
 
     The script is given two values (other than standard builtins):
@@ -24,7 +24,7 @@
 
 from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
-from utilities import getAmbidexterityScript
+from utilities import getAmbidexterityFile
 from utilities import rmFieldScript
 from utilities import updateFieldScript
 from z3c.form.validator import SimpleFieldValidator
@@ -57,7 +57,7 @@ class Validator(SimpleFieldValidator):
         field = self.field
         field_name = field.getName()
         ctype_name = field.interface.getName()
-        script = getAmbidexterityScript(ctype_name, field_name, 'validate.py')
+        script = getAmbidexterityFile(ctype_name, field_name, 'validate.py')
         cp = AmbidexterityProgram(script)
         cp_globals = dict(value=value, context=self.context)
         rez = cp.execute(cp_globals)

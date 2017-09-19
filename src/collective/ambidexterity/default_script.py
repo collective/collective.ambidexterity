@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
     Supply a Dexterity context-aware default from a Python script
-    found via getAmbidexterityScript and executed via
+    found via getAmbidexterityFile and executed via
     AmbidexterityProgram.
 
     The script is given one value (other than standard builtins):
@@ -16,7 +16,7 @@
 from interpreter import AmbidexterityProgram
 from Products.CMFPlone.utils import safe_unicode
 from utilities import addFieldScript
-from utilities import getAmbidexterityScript
+from utilities import getAmbidexterityFile
 from utilities import getFrameLocal
 from utilities import rmFieldScript
 from utilities import updateFieldScript
@@ -47,10 +47,10 @@ def default(context):
     field = getFrameLocal(stack, 1, 'inst')
     field_name = field.getName()
     ctype_name = field.interface.getName()
-    script = getAmbidexterityScript(ctype_name, field_name, 'default.py')
+    script = getAmbidexterityFile(ctype_name, field_name, 'default.py')
     cp = AmbidexterityProgram(script)
     result = cp.execute(dict(context=context))['default']
-    if type(result) is types.StringType:
+    if isinstance(result, types.StringType):
         # fix a likely common error in script returns
         return safe_unicode(result)
     else:
