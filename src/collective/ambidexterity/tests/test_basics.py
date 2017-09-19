@@ -157,19 +157,22 @@ class TestSetup(unittest.TestCase):
                         'has_default': True,
                         'has_vocabulary': False,
                         'has_validator': False,
-                        'title': 'Test Integer Field'
+                        'title': 'Test Integer Field',
+                        'schema_type': 'zope.schema.Int',
                     },
                     'test_string_field': {
                         'has_default': True,
                         'has_vocabulary': False,
                         'has_validator': True,
-                        'title': 'Test String Field'
+                        'title': 'Test String Field',
+                        'schema_type': 'zope.schema.TextLine',
                     },
                     'test_choice_field': {
                         'has_default': False,
                         'has_vocabulary': True,
                         'has_validator': False,
-                        'title': 'Test Choice Field'
+                        'title': 'Test Choice Field',
+                        'schema_type': 'zope.schema.Choice',
                     }
                 },
                 'has_model_source': True,

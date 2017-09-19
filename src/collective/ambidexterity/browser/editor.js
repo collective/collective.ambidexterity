@@ -270,8 +270,8 @@ require([
     }
 
 
-    editor_init();
     get_inventory();
-    setEditorSize();
     init_events();
+    setEditorSize();
+    editor_init();
 });

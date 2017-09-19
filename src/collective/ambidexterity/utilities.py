@@ -75,7 +75,7 @@ def getResourcesInventory():
         if type_folder is not None and type_folder.get('view.pt') is not None:
             content_type['has_view'] = True
         if content_type['has_model_source']:
-            for field, title in models.getFieldList(fid):
+            for field, title, ctype in models.getFieldList(fid):
                 if type_folder is not None:
                     field_folder = type_folder.get(field)
                 else:
@@ -89,6 +89,7 @@ def getResourcesInventory():
                     has_default='default.py' in script_ids,
                     has_validator='validate.py' in script_ids,
                     has_vocabulary='vocabulary.py' in script_ids,
+                    schema_type=ctype,
                 )
         resources[fid] = content_type
     return resources

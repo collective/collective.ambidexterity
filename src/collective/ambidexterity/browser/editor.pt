@@ -58,11 +58,11 @@ span.btn-label {
     <div id="page-intro">
 
       <h1 class="documentFirstHeading" i18n:translate="heading_edit">
-          Edit
+          Ambidexterity editor
       </h1>
 
       <p class="description" i18n:translate="description_edit">
-        Description
+        Through-the-web editing of Dexterity content type views, defaults, validators and vocabularies.
       </p>
 
       <form id="available_actions">
