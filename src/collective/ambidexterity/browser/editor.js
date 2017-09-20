@@ -31,8 +31,8 @@ require([
         abandon_button = $("#abandon_edits"),
         save_button = $("#save_edits"),
         field_scripts = ['default', 'validator', 'vocabulary'],
-        editor,
-        doc_changed;
+        watch_editor_changes = false,
+        editor;
 
 
     function get_authenticator() {
@@ -97,6 +97,7 @@ require([
     function editor_set_source(source) {
         var editor_session = editor.getSession();
 
+        watch_editor_changes = false;
         editor_session.setValue(source);
         editor.gotoLine(1, 1);
         if (source.trim().startsWith('<')) {
@@ -104,12 +105,18 @@ require([
         } else {
             editor_session.setMode("ace/mode/python");
         }
-        doc_changed = false;
         // Changing the source will have generated a change event,
         // so we need to fix our buttons.
         save_button.attr('disabled', 'disabled');
         abandon_button.attr('disabled', 'disabled');
         enable_actions();
+    }
+
+
+    function clear_editor() {
+        watch_editor_changes = false;
+        editor.getSession().setValue('');
+        data_form.children("#edit-label").text('');
     }
 
 
@@ -153,6 +160,7 @@ require([
                     $('#remove_' + value).hide();
                 });
             }
+            clear_editor();
         });
 
         $("form#available_actions button").click(function (e) {
@@ -168,7 +176,7 @@ require([
             };
 
             $.post("@@ambidexterityajax/button_action?_authenticator=" + get_authenticator(), data_in, function(data) {
-                editor.setValue('');
+                clear_editor();
                 if (data.action === 'edit') {
                     editor_set_source(data.source);
                     data_form.children("#edit-label").text(
@@ -177,8 +185,17 @@ require([
                     data_form.children("input[name='content_type']").val(content_type);
                     data_form.children("input[name='field_name']").val(field_name);
                     data_form.children("input[name='script']").val(button_id);
+                    watch_editor_changes = true;
+                } else {
+                    // an add or remove
+                    get_inventory();
+                    if (button_id.startsWith('add_')) {
+                        // push the edit button
+                        setTimeout(function () {
+                            $('#edit_' + button_id.replace('add_', '')).eq(0).click();
+                        }, 100);
+                    }
                 }
-                get_inventory();
             }, 'json');
         });
 
@@ -196,7 +213,6 @@ require([
             $.post("@@ambidexterityajax/save_action", data_in, function(data) {
                 if (data.result === 'success') {
                     enable_actions();
-                    doc_changed = false;
                     save_button.attr('disabled', 'disabled');
                     abandon_button.attr('disabled', 'disabled');
                 } else {
@@ -209,7 +225,7 @@ require([
         abandon_button.click(function (e) {
             e.preventDefault();
             if (window.confirm("Do you wish to abandon changes?")) {
-                editor_set_source('');
+                clear_editor();
                 enable_actions();
             }
         });
@@ -225,6 +241,9 @@ require([
     function editor_init() {
         if (!editor) {
             var editor_session;
+
+            // set initial height
+            $("#source_editor").height($(window).height() - 400);
 
             if (!window.ace) {
                 // XXX hack...
@@ -255,23 +274,17 @@ require([
 
             // enable save submit button on change
             editor_session.on('change', function(e) {
-                save_button.removeAttr('disabled');
-                abandon_button.removeAttr('disabled');
-                disable_actions();
-                doc_changed = true;
+                if (watch_editor_changes) {
+                    save_button.removeAttr('disabled');
+                    abandon_button.removeAttr('disabled');
+                    disable_actions();
+                }
             });
         }
     } // editor_init
 
 
-    function setEditorSize() {
-        var wheight = $(window).height();
-        $("#source_editor").height(wheight - 400);
-    }
-
-
     get_inventory();
-    init_events();
-    setEditorSize();
     editor_init();
+    init_events();
 });

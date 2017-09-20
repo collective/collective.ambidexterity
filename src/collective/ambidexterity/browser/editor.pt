@@ -13,12 +13,6 @@
 #content {
     margin-bottom: 20px;
 }
-#source_editor {
-    right: 1px;
-    left: 1px;
-    z-index: 1;
-    border: 1px solid #ccc;
-}
 div.plone-btn-group {
   margin: 0.25em 0;
 }
@@ -92,7 +86,7 @@ span.btn-label {
 
     </div>
 
-    <form id="dataform" class="plone-btn-group">
+    <form id="dataform" class="plone-btn-group pull-right" style="margin-top: 1em">
       <!-- A place to save data we may need -->
       <span id="edit-label" />
       <input tal:replace="structure context/@@authenticator/authenticator" />
@@ -103,8 +97,9 @@ span.btn-label {
       <input class="plone-btn plone-btn-danger" type="cancel" id="abandon_edits" value="Abandon changes" disabled="disabled" />
     </form>
 
-    <div id="source_editor" style="margin: 2em 0" />
-
+    <div style="clear: both">
+        <div id="source_editor"/>
+    </div>
 
   </tal:main-macro>
 </metal:main>
