@@ -10,6 +10,7 @@ SIMPLE_DEXTERITY_CLASSES = (
     'plone.dexterity.content.Container',
     'plone.dexterity.content.Item',
 )
+ALLOW_VOCABULARIES = ['zope.schema.Choice', 'zope.schema.Set']
 plone_munge = re.compile(r"""plone_\d+_""", flags=re.IGNORECASE)
 
 
@@ -89,7 +90,7 @@ def getResourcesInventory():
                     has_default='default.py' in script_ids,
                     has_validator='validate.py' in script_ids,
                     has_vocabulary='vocabulary.py' in script_ids,
-                    schema_type=ctype,
+                    allow_vocabulary=ctype in ALLOW_VOCABULARIES,
                 )
         resources[fid] = content_type
     return resources

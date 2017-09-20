@@ -152,6 +152,9 @@ require([
                         $('#edit_' + value).hide();
                         $('#remove_' + value).hide();
                     }
+                    if (!field_info['allow_vocabulary']) {
+                        $('#add_vocabulary').hide();
+                    }
                 });
             } else {
                 $.each(field_scripts, function(index, value) {
