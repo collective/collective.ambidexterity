@@ -47,6 +47,9 @@ def default(context):
     field = getFrameLocal(stack, 1, 'inst')
     field_name = field.getName()
     ctype_name = field.interface.getName()
+    if ctype_name == u'__tmp__':
+        # We're inside the schema editor, adding a new field.
+        return None
     script = getAmbidexterityFile(ctype_name, field_name, 'default.py')
     cp = AmbidexterityProgram(script)
     result = cp.execute(dict(context=context))['default']

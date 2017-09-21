@@ -13,9 +13,9 @@
 
 from plone import api
 from Products.Five import BrowserView
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
-from collective.ambidexterity.utilities import getContentTypeFolder
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from utilities import getContentTypeFolder
 
 
 BASE_VIEW_TEMPLATE = """<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
