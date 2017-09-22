@@ -20,18 +20,18 @@ class TestSetup(unittest.TestCase):
 
         applyProfile(self.portal, 'collective.ambidexterity:testing')
 
-    def test_usefulTypes(self):
-        types = models.usefulTypes()
-        self.assertEqual(len(types), 1)
-        my_type = types[0]
-        self.assertEquals(my_type['id'], 'simple_test_type')
+    def test_typeInventory(self):
+        ftis = models.typeInventory()
+        my_type = ftis['simple_test_type']
+        self.assertEqual(my_type['id'], 'simple_test_type')
+        self.assertEqual(my_type['view'], '@@ambidexterityview')
         fields = my_type['fields']
         self.assertEqual(len(fields), 3)
-        self.assertEqual(fields[0]['defaultFactory'], 'collective.ambidexterity.default')
-        self.assertEqual(fields[1]['validator'], 'collective.ambidexterity.validate')
-        self.assertEqual(fields[2]['source'], 'collective.ambidexterity.vocabulary')
-        self.assertEqual(fields[2]['vocab_type'], 'source')
-        self.assertEqual(fields[2]['defaultFactory'], None)
+        self.assertEqual(fields['test_integer_field']['defaultFactory'], 'collective.ambidexterity.default')
+        self.assertEqual(fields['test_string_field']['validator'], 'collective.ambidexterity.validate')
+        self.assertEqual(fields['test_choice_field']['source'], 'collective.ambidexterity.vocabulary')
+        self.assertEqual(fields['test_choice_field']['vocab_type'], 'source')
+        self.assertEqual(fields['test_choice_field']['defaultFactory'], None)
 
     def test_getModel(self):
         root = models.getModelRoot('simple_test_type')

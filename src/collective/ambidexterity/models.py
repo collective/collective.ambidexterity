@@ -28,15 +28,16 @@ def efind(e, tag, ns=SCHEMA_NAMESPACE):
     return e.find(".//{}".format(qname(tag, ns)))
 
 
-def usefulTypes():
-    rez = []
-    for fti in utilities.getSimpleDexterityFTIs():
+def typeInventory():
+    rez = {}
+    for fti in utilities.getDexterityTypes():
         d = {}
         d['title'] = fti.title
         d['id'] = fti.getId()
-        my_fields = []
-        model_source = getattr(fti, 'model_source', None)
-        if model_source is not None:
+        d['view'] = fti.default_view
+        my_fields = {}
+        model_source = getattr(fti, 'model_source', '')
+        if len(model_source) > 0:
             root = etree.XML(model_source)
             for field in efindall(root, 'field'):
                 df = dict(
@@ -60,9 +61,9 @@ def usefulTypes():
                 else:
                     df['source'] = None
                 df['vocab_type'] = vocab_type
-                my_fields.append(df)
+                my_fields[df['id']] = df
         d['fields'] = my_fields
-        rez.append(d)
+        rez[d['id']] = d
     return rez
 
 
