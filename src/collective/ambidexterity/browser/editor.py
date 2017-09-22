@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from collective.ambidexterity import audit
 from collective.ambidexterity import default_script
 from collective.ambidexterity import models
 from collective.ambidexterity import validator_script
@@ -25,6 +26,9 @@ class EditorView(BrowserView):
     def resource_url(self):
         url = self.context.absolute_url() + "/@@ambidexterityajax/resource_inventory"
         return addTokenToUrl(url)
+
+    def audit_is_clean(self):
+        return audit.auditIsClean()
 
 
 class EditorAjax(BrowserView):
