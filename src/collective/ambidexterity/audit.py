@@ -45,23 +45,26 @@ def auditResourceModelMatch():
         rez[ctype_name] = irez
         ctype_fti = fti_support[ctype_name]
         if ctype_resources['has_view'] and ctype_fti['view'] != '@@ambidexterityview':
+            assert(NO_VIEW_IN_FTI not in irez['problems'])
             irez['problems'].append(NO_VIEW_IN_FTI)
-        for field_name, field_resources in ctype_resources['fields'].items():
-            field_fti = ctype_fti['fields'][field_name]
-            frez = []
-            irez['fields'][field_name] = frez
-            if field_resources['has_default'] and field_fti['defaultFactory'] != 'collective.ambidexterity.default':
-                frez.append(NO_DEFAULT_IN_FTI)
-            if field_resources['has_validator'] and field_fti['validator'] != 'collective.ambidexterity.validate':
-                frez.append(NO_VALIDATOR_IN_FTI)
-            if field_resources['has_vocabulary'] and field_fti['source'] != 'collective.ambidexterity.vocabulary':
-                frez.append(NO_VOCABULARY_IN_FTI)
+        if ctype_fti['has_model_source']:
+            for field_name, field_resources in ctype_resources['fields'].items():
+                field_fti = ctype_fti['fields'][field_name]
+                frez = []
+                irez['fields'][field_name] = frez
+                if field_resources['has_default'] and field_fti['defaultFactory'] != 'collective.ambidexterity.default':
+                    frez.append(NO_DEFAULT_IN_FTI)
+                if field_resources['has_validator'] and field_fti['validator'] != 'collective.ambidexterity.validate':
+                    frez.append(NO_VALIDATOR_IN_FTI)
+                if field_resources['has_vocabulary'] and field_fti['source'] != 'collective.ambidexterity.vocabulary':
+                    frez.append(NO_VOCABULARY_IN_FTI)
 
-        # run through the FTIs to see if there are matching resources
-        for ctype_name, ctype_fti in fti_support.items():
-            irez = rez.setdefault(ctype_name, dict(problems=[], fields={}))
-            if ctype_fti['view'] == '@@ambidexterityview' and not resources[ctype_name]['has_view']:
-                irez['problems'].append(VIEW_TEMPLATE_MISSING)
+    # run through the FTIs to see if there are matching resources
+    for ctype_name, ctype_fti in fti_support.items():
+        irez = rez.setdefault(ctype_name, dict(problems=[], fields={}))
+        if ctype_fti['view'] == '@@ambidexterityview' and not resources[ctype_name]['has_view']:
+            irez['problems'].append(VIEW_TEMPLATE_MISSING)
+        if ctype_fti['has_model_source']:
             for field_name, element in fti_support[ctype_name]['fields'].items():
                 field_resources = resources[ctype_name]['fields'][field_name]
                 frez = irez['fields'].setdefault(field_name, [])

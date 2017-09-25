@@ -64,12 +64,12 @@ def getResourcesInventory():
     pr = api.portal.get_tool(name='portal_resources')
     ambidexterity_folder = pr.get('ambidexterity')
     resources = {}
-    for fti in getSimpleDexterityFTIs():
+    for fti in getDexterityTypes():
         fid = fti.getId()
         content_type = dict(
             title=fti.title,
             fields={},
-            has_model_source=getattr(fti, 'model_source', None) is not None,
+            has_model_source=len(getattr(fti, 'model_source', '')) > 0,
             has_view=False,
         )
         if ambidexterity_folder is None:

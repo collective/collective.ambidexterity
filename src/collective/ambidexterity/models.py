@@ -37,7 +37,9 @@ def typeInventory():
         d['view'] = fti.default_view
         my_fields = {}
         model_source = getattr(fti, 'model_source', '')
-        if len(model_source) > 0:
+        has_model_source = len(model_source) > 0
+        d['has_model_source'] = has_model_source
+        if has_model_source:
             root = etree.XML(model_source)
             for field in efindall(root, 'field'):
                 df = dict(

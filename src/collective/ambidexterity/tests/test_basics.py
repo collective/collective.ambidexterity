@@ -11,7 +11,91 @@ from plone.dexterity.utils import createContent
 from zope.interface import Invalid
 from zope.schema.vocabulary import SimpleVocabulary
 
+import pprint
 import unittest
+
+
+pprint = pprint.PrettyPrinter(indent=4).pprint
+
+
+EXPECTED_INVENTORY = {
+    'Collection': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'Collection'
+    },
+    'Document': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'Page'
+    },
+    'Event': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'Event'
+    },
+    'File': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'File'
+    },
+    'Folder': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'Folder'
+    },
+    'Image': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'Image'
+    },
+    'Link': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'Link'
+    },
+    'News Item': {
+        'fields': {},
+        'has_model_source': False,
+        'has_view': False,
+        'title': 'News Item'
+    },
+    'simple_test_type': {
+        'fields': {
+            'test_choice_field': {
+                'allow_vocabulary': True,
+                'has_default': False,
+                'has_validator': False,
+                'has_vocabulary': True,
+                'title': 'Test Choice Field'
+            },
+            'test_integer_field': {
+                'allow_vocabulary': False,
+                'has_default': True,
+                'has_validator': False,
+                'has_vocabulary': False,
+                'title': 'Test Integer Field'
+            },
+            'test_string_field': {
+                'allow_vocabulary': False,
+                'has_default': True,
+                'has_validator': True,
+                'has_vocabulary': False,
+                'title': 'Test String Field'
+            }
+        },
+        'has_model_source': True,
+        'has_view': True,
+        'title': 'Simple Test Type'
+    }
+}
 
 
 class TestSetup(unittest.TestCase):
@@ -150,33 +234,4 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(ftis[0].getId(), 'simple_test_type')
 
     def test_inventory(self):
-        self.assertEquals(utilities.getResourcesInventory(), {
-            'simple_test_type': {
-                'fields': {
-                    'test_integer_field': {
-                        'has_default': True,
-                        'has_vocabulary': False,
-                        'has_validator': False,
-                        'title': 'Test Integer Field',
-                        'allow_vocabulary': False,
-                    },
-                    'test_string_field': {
-                        'has_default': True,
-                        'has_vocabulary': False,
-                        'has_validator': True,
-                        'title': 'Test String Field',
-                        'allow_vocabulary': False,
-                    },
-                    'test_choice_field': {
-                        'has_default': False,
-                        'has_vocabulary': True,
-                        'has_validator': False,
-                        'title': 'Test Choice Field',
-                        'allow_vocabulary': True,
-                    }
-                },
-                'has_model_source': True,
-                'title': 'Simple Test Type',
-                'has_view': True,
-            },
-        })
+        self.assertEquals(utilities.getResourcesInventory(), EXPECTED_INVENTORY)
