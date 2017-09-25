@@ -111,7 +111,9 @@ def resynchronize_content_type(ctype_name, ctype_report=None):
 
     if ctype_report is None:
         arez = auditResourceModelMatch()
-        ctype_report = arez[ctype_name]
+        ctype_report = arez.get(ctype_name)
+        if ctype_report is None:
+            return
     for problem in ctype_report['problems']:
         if problem == NO_VIEW_IN_FTI:
             logger.info("Fixing %s: %s", ctype_name, WARNING_MESSAGES[NO_VIEW_IN_FTI])
