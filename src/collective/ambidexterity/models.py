@@ -116,6 +116,11 @@ def setDefaultFactory(id, field_name):
     assert(efind(field_element, 'defaultFactory') is None)
     df = etree.SubElement(field_element, qname('defaultFactory'))
     df.text = 'collective.ambidexterity.default'
+    # remove 'default' element, if present
+    default_element = efind(field_element, 'default')
+    if default_element is not None:
+        field_element.remove(default_element)
+    # save it
     setModelSourceFromXML(id, root)
 
 
