@@ -16,6 +16,7 @@ from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
 from utilities import getAmbidexterityFile
 from utilities import getFrameLocal
+from utilities import logger
 from utilities import rmFieldScript
 from utilities import updateFieldScript
 from zope.interface import provider
@@ -45,6 +46,7 @@ def vocabulary(context):
     field = getFrameLocal(stack, 1, 'self')
     field_name = field.getName()
     ctype_name = field.interface.getName()
+    logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
     script = getAmbidexterityFile(ctype_name, field_name, 'vocabulary.py')
     cp = AmbidexterityProgram(script)
     cp_globals = dict(context=context)

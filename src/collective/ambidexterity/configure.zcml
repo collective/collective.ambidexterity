@@ -64,4 +64,9 @@
       layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
       />
 
+  <subscriber
+      for="plone.schemaeditor.interfaces.ISchemaModifiedEvent"
+      handler=".subscribers.resync_if_necessary"
+  />
+
 </configure>

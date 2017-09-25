@@ -3,6 +3,7 @@
 from plone import api
 from collective.ambidexterity import models
 
+import logging
 import re
 
 D_FTI = 'Dexterity FTI'
@@ -12,6 +13,8 @@ SIMPLE_DEXTERITY_CLASSES = (
 )
 ALLOW_VOCABULARIES = ['zope.schema.Choice', 'zope.schema.Set']
 plone_munge = re.compile(r"""plone_\d+_""", flags=re.IGNORECASE)
+
+logger = logging.getLogger('collective.ambidexterity')
 
 
 def getFrameLocal(stack, level, name):

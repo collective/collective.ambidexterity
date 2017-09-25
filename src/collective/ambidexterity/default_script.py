@@ -18,6 +18,7 @@ from Products.CMFPlone.utils import safe_unicode
 from utilities import addFieldScript
 from utilities import getAmbidexterityFile
 from utilities import getFrameLocal
+from utilities import logger
 from utilities import rmFieldScript
 from utilities import updateFieldScript
 from zope.interface import provider
@@ -48,8 +49,11 @@ def default(context):
     field_name = field.getName()
     ctype_name = field.interface.getName()
     if ctype_name == u'__tmp__':
-        # We're inside the schema editor, adding a new field.
+        # We're probably inside the schema editor, adding a new field.
+        logger.info('default called for {0}/{1}'.format(ctype_name, field_name))
         return None
+    else:
+        logger.debug('default called for {0}/{1}'.format(ctype_name, field_name))
     script = getAmbidexterityFile(ctype_name, field_name, 'default.py')
     cp = AmbidexterityProgram(script)
     result = cp.execute(dict(context=context))['default']

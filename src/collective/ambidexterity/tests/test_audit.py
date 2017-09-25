@@ -9,6 +9,8 @@ from collective.ambidexterity import view
 from collective.ambidexterity import vocabulary_script
 from collective.ambidexterity.testing import COLLECTIVE_AMBIDEXTERITY_INTEGRATION_TESTING  # noqa
 from plone.app.testing import applyProfile
+from zope.event import notify
+from plone.schemaeditor.utils import SchemaModifiedEvent
 
 import pprint
 import unittest
@@ -120,7 +122,7 @@ class TestSetup(unittest.TestCase):
         models.removeDefaultFactory('simple_test_type', 'test_string_field')
         models.removeValidator('simple_test_type', 'test_string_field')
         models.removeVocabulary('simple_test_type', 'test_choice_field')
-        audit.resynchronize()
+        audit.resynchronize_all()
         self.assertTrue(audit.auditIsClean(audit.auditResourceModelMatch()))
 
         # Remove all our scripts and templates
@@ -128,6 +130,19 @@ class TestSetup(unittest.TestCase):
         default_script.rmDefaultScript('simple_test_type', 'test_string_field')
         validator_script.rmValidatorScript('simple_test_type', 'test_string_field')
         vocabulary_script.rmVocabularyScript('simple_test_type', 'test_choice_field')
-        audit.resynchronize()
+        audit.resynchronize_all()
         report = audit.auditResourceModelMatch()
         self.assertTrue(audit.auditIsClean(report))
+
+    def test_schemaChangeSubscriber(self):
+        # damage the FTI
+        models.removeDefaultFactory('simple_test_type', 'test_string_field')
+        # audit: we expect a problem
+        self.assertFalse(audit.auditIsClean(audit.auditResourceModelMatch()))
+        # Notify our subscriber that the schema has changed
+        notify(SchemaModifiedEvent(self.portal.portal_types.simple_test_type))
+        # Now, we expect a clean audit
+        self.assertTrue(audit.auditIsClean(audit.auditResourceModelMatch()))
+
+    def test_subscriberOKforNonAmbidexterityTypes(self):
+        notify(SchemaModifiedEvent(self.portal.portal_types.Document))

@@ -15,6 +15,14 @@
       />
 
   <browser:page
+      name="ambidexterity_resynchronize"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class="collective.ambidexterity.browser.editor.ResyncView"
+      permission="plone.schemaeditor.ManageSchemata"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+      />
+
+  <browser:page
       name="ambidexterityajax"
       for="Products.CMFPlone.interfaces.IPloneSiteRoot"
       class="collective.ambidexterity.browser.editor.EditorAjax"

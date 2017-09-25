@@ -16,6 +16,7 @@ from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from utilities import getContentTypeFolder
+from utilities import logger
 
 
 BASE_VIEW_TEMPLATE = """<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
@@ -45,12 +46,13 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
     """
 
     def __init__(self, portal_type, template_name="view.pt", _prefix=None, content_type=None):
-        _prefix = self.get_path_from_prefix(_prefix)
         # ViewPageTemplateFile.__init__() does some file checking we wish to skip.
-        # super(ViewPageTemplateFile, self).__init__(filename, _prefix)
+        # So, not calling super(ViewPageTemplateFile, self).__init__(filename, _prefix)
+        _prefix = self.get_path_from_prefix(_prefix)
         self.filename = '/'.join(('ambidexterity', portal_type, template_name))
         if content_type is not None:
             self.content_type = content_type
+        logger.debug('view initialized for {0}'.format(portal_type))
 
     def _read_file(self):
         # zope.pagetemplate.pagetemplatefile equivalent, but fetches text

@@ -28,7 +28,22 @@ class EditorView(BrowserView):
         return addTokenToUrl(url)
 
     def audit_is_clean(self):
-        return audit.auditIsClean()
+        audit_rez = audit.auditResourceModelMatch()
+        return audit.auditIsClean(audit_rez)
+
+    def audit_report(self):
+        return audit.readableAuditReport()
+
+
+class ResyncView(BrowserView):
+    """Resynchronization view.
+    """
+
+    def __call__(self):
+        PostOnly(self.request)
+        CheckAuthenticator(self.request)
+        audit.resynchronize()
+        self.request.RESPONSE.redirect(self.context.absolute_url() + '/@@ambidexterityeditor')
 
 
 class EditorAjax(BrowserView):
@@ -54,7 +69,7 @@ class EditorAjax(BrowserView):
         """ Respond to button clicks.
         """
 
-        PostOnly(self.context.REQUEST)
+        PostOnly(self.request)
         CheckAuthenticator(self.request)
 
         form = self.request.form

@@ -4,6 +4,7 @@
 """
 
 from collective.ambidexterity import _
+from utilities import logger
 
 import models
 import pprint
@@ -104,28 +105,43 @@ def readableAuditReport():
     return "\n".join(results)
 
 
-def resynchronize():
-    # our usual fix strategy is to fix the FTI.
+def resynchronize_content_type(ctype_name, ctype_report=None):
+    # our strategy is to fix the FTI.
     # we won't add templates/scripts.
 
+    if ctype_report is None:
+        arez = auditResourceModelMatch()
+        ctype_report = arez[ctype_name]
+    for problem in ctype_report['problems']:
+        if problem == NO_VIEW_IN_FTI:
+            logger.info("Fixing %s: %s", ctype_name, WARNING_MESSAGES[NO_VIEW_IN_FTI])
+            models.setAmbidexterityView(ctype_name)
+        elif problem == VIEW_TEMPLATE_MISSING:
+            models.removeAmbidexterityView(ctype_name)
+            logger.info("Fixing %s: %s.", ctype_name, WARNING_MESSAGES[VIEW_TEMPLATE_MISSING])
+    for field_name, field_report in ctype_report['fields'].items():
+        for problem in field_report:
+            if problem == NO_DEFAULT_IN_FTI:
+                logger.info("Fixing %s/%s: %s", ctype_name, field_name, WARNING_MESSAGES[NO_DEFAULT_IN_FTI])
+                models.setDefaultFactory(ctype_name, field_name)
+            elif problem == DEFAULT_SCRIPT_MISSING:
+                logger.info("Fixing %s/%s: %s", ctype_name, field_name, WARNING_MESSAGES[DEFAULT_SCRIPT_MISSING])
+                models.removeDefaultFactory(ctype_name, field_name)
+            elif problem == NO_VALIDATOR_IN_FTI:
+                logger.info("Fixing %s/%s: %s", ctype_name, field_name, WARNING_MESSAGES[NO_VALIDATOR_IN_FTI])
+                models.setValidator(ctype_name, field_name)
+            elif problem == VALIDATOR_SCRIPT_MISSING:
+                logger.info("Fixing %s/%s: %s", ctype_name, field_name, WARNING_MESSAGES[VALIDATOR_SCRIPT_MISSING])
+                models.removeValidator(ctype_name, field_name)
+            elif problem == NO_VOCABULARY_IN_FTI:
+                logger.info("Fixing %s/%s: %s", ctype_name, field_name, WARNING_MESSAGES[NO_VOCABULARY_IN_FTI])
+                models.setVocabulary(ctype_name, field_name)
+            elif problem == VOCABULARY_SCRIPT_MISSING:
+                logger.info("Fixing %s/%s: %s", ctype_name, field_name, WARNING_MESSAGES[VOCABULARY_SCRIPT_MISSING])
+                models.removeVocabulary(ctype_name, field_name)
+
+
+def resynchronize_all():
     arez = auditResourceModelMatch()
     for ctype_name, ctype_report in arez.items():
-        for problem in ctype_report['problems']:
-            if problem == NO_VIEW_IN_FTI:
-                models.setAmbidexterityView(ctype_name)
-            elif problem == VIEW_TEMPLATE_MISSING:
-                models.removeAmbidexterityView(ctype_name)
-        for field_name, field_report in ctype_report['fields'].items():
-            for problem in field_report:
-                if problem == NO_DEFAULT_IN_FTI:
-                    models.setDefaultFactory(ctype_name, field_name)
-                elif problem == DEFAULT_SCRIPT_MISSING:
-                    models.removeDefaultFactory(ctype_name, field_name)
-                elif problem == NO_VALIDATOR_IN_FTI:
-                    models.setValidator(ctype_name, field_name)
-                elif problem == VALIDATOR_SCRIPT_MISSING:
-                    models.removeValidator(ctype_name, field_name)
-                elif problem == NO_VOCABULARY_IN_FTI:
-                    models.setVocabulary(ctype_name, field_name)
-                elif problem == VOCABULARY_SCRIPT_MISSING:
-                    models.removeVocabulary(ctype_name, field_name)
+        resynchronize_content_type(ctype_name, ctype_report=ctype_report)

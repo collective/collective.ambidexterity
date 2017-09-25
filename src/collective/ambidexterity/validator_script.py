@@ -25,6 +25,7 @@
 from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
 from utilities import getAmbidexterityFile
+from utilities import logger
 from utilities import rmFieldScript
 from utilities import updateFieldScript
 from z3c.form.validator import SimpleFieldValidator
@@ -38,16 +39,12 @@ VALIDATOR_SCRIPT = """# Validator script.
 #     context -- the folder in which the item is being added.
 #     value -- the value to test for validity.
 # If the validator script determines the value is invalid, it should do
-# one of the following:
+# assign an error message to a variable named "error_message".
 #
-#     * print an error message using Python's "print"; or,
-#
-#     * assign an error message to a variable named "error_message".
-#
-# If the value is valid, do not do either of the above.
+# If the value is valid, do not assign a value to error_message.
 # The absence of an error message is taken to mean all is OK.
 
-error_message = u"This is an error message."
+# error_message = u"This is an error message."
 """
 
 
@@ -57,15 +54,13 @@ class Validator(SimpleFieldValidator):
         field = self.field
         field_name = field.getName()
         ctype_name = field.interface.getName()
+        logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
         script = getAmbidexterityFile(ctype_name, field_name, 'validate.py')
         cp = AmbidexterityProgram(script)
         cp_globals = dict(value=value, context=self.context)
         rez = cp.execute(cp_globals)
         result = rez.get('error_message')
         if result is not None:
-            raise Invalid(result)
-        result = rez['_print']().strip()
-        if len(result) > 0:
             raise Invalid(result)
 
 

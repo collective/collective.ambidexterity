@@ -45,7 +45,7 @@ class TestSetup(unittest.TestCase):
         field_folder = pr.ambidexterity.simple_test_type.test_string_field
         field_folder.manage_addFile('validate.py')
         field_folder['validate.py'].update_data(
-            'if u"bad" in value.lower():\n  print u"At %s, value is bad: %s" % (context.getId(), value)'
+            'if u"bad" in value.lower():\n  error_message = u"At %s, value is bad: %s" % (context.getId(), value)'
         )
 
         field_folder = pr.ambidexterity.simple_test_type.test_string_field
