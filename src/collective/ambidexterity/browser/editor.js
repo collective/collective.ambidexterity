@@ -44,16 +44,26 @@ require([
         var fields = inventory[selected].fields,
             sorted_keys = Object.keys(fields);
 
-        sorted_keys.sort();
-        fields_select.empty();
-        $.each(sorted_keys, function(index, key) {
-            fields_select.append(
-                $("<option />", {
-                    value: key,
-                    html: fields[key].title
-                })
-            );
-        });
+        if (sorted_keys.length > 0) {
+            sorted_keys.sort();
+            fields_select.empty();
+            $.each(sorted_keys, function(index, key) {
+                fields_select.append(
+                    $("<option />", {
+                        value: key,
+                        html: fields[key].title
+                    })
+                );
+            });
+            fields_select.show();
+            fields_select.prev().show();
+            $("#script_label").show();
+        } else {
+            fields_select.hide();
+            fields_select.prev().hide();
+            $("#script_label").hide();
+        }
+
         fields_select.change();
     }
 

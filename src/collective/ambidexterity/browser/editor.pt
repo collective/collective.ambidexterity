@@ -19,7 +19,7 @@ div.plone-btn-group {
 div.plone-btn-group {
   margin: 0.75em 0;
 }
-span.btn-label {
+.btn-label {
     font-weight: bold;
     display: inline-block;
     width: 7%;
@@ -91,8 +91,8 @@ span.btn-label {
 
     <section tal:condition="view/audit_is_clean">
       <form id="available_actions">
-        <strong>Content types:</strong> <select id="content_types" />
-        <strong>Fields:</strong> <select id="cfields" /><br />
+        <label for="content_types">Content types:</label> <select id="content_types" name="content_types" />
+        <label for="cfields">Fields:</label> <select id="cfields" name="cfields" /><br />
         <div class="plone-btn-group">
           <span class="btn-label">View:</span>
           <button class="plone-btn" type="button" id="add_view" style="display:none">Add view</button>
@@ -100,7 +100,7 @@ span.btn-label {
           <button class="plone-btn plone-btn-danger" type="button" id="remove_view" style="display:none">Remove view</button>
         </div>
         <div class="plone-btn-group">
-          <span class="btn-label">Scripts:</span>
+          <span class="btn-label" id="script_label">Scripts:</span>
           <button class="plone-btn" type="button" id="add_default" style="display:none">Add default</button>
           <button class="plone-btn" type="button" id="edit_default" style="display:none">Edit default</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_default">Remove default</button>
