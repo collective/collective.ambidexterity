@@ -31,7 +31,7 @@ BASE_VIEW_TEMPLATE = """<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
 <metal:content-core fill-slot="content-core">
 <metal:content-core define-macro="content-core">
   <p>
-    This is the default Ambidexterity view for <span tal:replace="context/portal_type" />.
+    This is the default Ambidexterity view for <span tal:replace="context/portal_type">portal type</span>.
   </p>
 </metal:content-core>
 </metal:content-core>

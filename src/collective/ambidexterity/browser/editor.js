@@ -44,9 +44,9 @@ require([
         var fields = inventory[selected].fields,
             sorted_keys = Object.keys(fields);
 
+        fields_select.empty();
         if (sorted_keys.length > 0) {
             sorted_keys.sort();
-            fields_select.empty();
             $.each(sorted_keys, function(index, key) {
                 fields_select.append(
                     $("<option />", {
