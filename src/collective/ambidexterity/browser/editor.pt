@@ -95,23 +95,23 @@ span.btn-label {
         <strong>Fields:</strong> <select id="cfields" /><br />
         <div class="plone-btn-group">
           <span class="btn-label">View:</span>
-          <button class="plone-btn" type="button" id="add_view">Add view</button>
-          <button class="plone-btn" type="button" id="edit_view">Edit view</button>
-          <button class="plone-btn plone-btn-danger" type="button" id="remove_view">Remove view</button>
+          <button class="plone-btn" type="button" id="add_view" style="display:none">Add view</button>
+          <button class="plone-btn" type="button" id="edit_view" style="display:none">Edit view</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_view" style="display:none">Remove view</button>
         </div>
         <div class="plone-btn-group">
           <span class="btn-label">Scripts:</span>
-          <button class="plone-btn" type="button" id="add_default">Add default</button>
-          <button class="plone-btn" type="button" id="edit_default">Edit default</button>
+          <button class="plone-btn" type="button" id="add_default" style="display:none">Add default</button>
+          <button class="plone-btn" type="button" id="edit_default" style="display:none">Edit default</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_default">Remove default</button>
           &#160; &#160;
-          <button class="plone-btn" type="button" id="add_validator">Add validator</button>
-          <button class="plone-btn" type="button" id="edit_validator">Edit validator</button>
-          <button class="plone-btn plone-btn-danger" type="button" id="remove_validator">Remove validator</button>
+          <button class="plone-btn" type="button" id="add_validator" style="display:none">Add validator</button>
+          <button class="plone-btn" type="button" id="edit_validator" style="display:none">Edit validator</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_validator" style="display:none">Remove validator</button>
           &#160; &#160;
-          <button class="plone-btn" type="button" id="add_vocabulary">Add vocabulary</button>
-          <button class="plone-btn" type="button" id="edit_vocabulary">Edit vocabulary</button>
-          <button class="plone-btn plone-btn-danger" type="button" id="remove_vocabulary">Remove vocabulary</button>
+          <button class="plone-btn" type="button" id="add_vocabulary" style="display:none">Add vocabulary</button>
+          <button class="plone-btn" type="button" id="edit_vocabulary" style="display:none">Edit vocabulary</button>
+          <button class="plone-btn plone-btn-danger" type="button" id="remove_vocabulary" style="display:none">Remove vocabulary</button>
         </div>
       </form>
 
