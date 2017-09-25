@@ -41,12 +41,16 @@ require([
 
 
     function fill_fields(selected) {
+        var fields = inventory[selected].fields,
+            sorted_keys = Object.keys(fields);
+
+        sorted_keys.sort();
         fields_select.empty();
-        $.each(inventory[selected].fields, function(key, val) {
+        $.each(sorted_keys, function(index, key) {
             fields_select.append(
                 $("<option />", {
                     value: key,
-                    html: val.title
+                    html: fields[key].title
                 })
             );
         });
@@ -55,15 +59,17 @@ require([
 
 
     function fill_content_select() {
-        var selected = content_type_select.val();
+        var selected = content_type_select.val(),
+        sorted_keys = Object.keys(inventory);
 
         content_type_select.empty();
-        $.each(inventory, function(key, val) {
+        sorted_keys.sort();
+        $.each(sorted_keys, function(index, key) {
             var new_option;
 
             new_option = $("<option />", {
                 value: key,
-                html: val.title
+                html: inventory[key].title
             });
             content_type_select.append(new_option);
         });
