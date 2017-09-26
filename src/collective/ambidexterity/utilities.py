@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from plone import api
 from collective.ambidexterity import models
+from cStringIO import StringIO
+from plone import api
+from plone.resource.directory import PersistentResourceDirectory
 
 import logging
 import re
@@ -145,3 +147,11 @@ def rmFieldScript(ctype_name, field_name, script_id):
 def updateFieldScript(ctype_name, field_name, script_id, body):
     ff = getFieldFolder(ctype_name, field_name)
     ff[script_id].update_data(body)
+
+
+def contentTypeZip(ctype_name):
+    ctype_folder = getContentTypeFolder(ctype_name)
+    ctype_folder = PersistentResourceDirectory(ctype_folder)
+    archive_stream = StringIO()
+    ctype_folder.exportZip(archive_stream)
+    return archive_stream.getvalue()

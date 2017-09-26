@@ -90,9 +90,18 @@ div.plone-btn-group {
     </section>
 
     <section tal:condition="view/audit_is_clean">
+
+      <form method="POST" action="@@ambidexterity_export" id="export_form" class="plone-btn-group pull-right">
+        <input tal:replace="structure context/@@authenticator/authenticator" />
+        <input type="hidden" name="ctype" value="" />
+        <input class="plone-btn" type="submit" value="Export content type resources" disabled="disabled" />
+      </form>
+
+
       <form id="available_actions">
         <label for="content_types">Content types:</label> <select id="content_types" name="content_types" />
-        <label for="cfields">Fields:</label> <select id="cfields" name="cfields" /><br />
+        <label for="cfields">Fields:</label> <select id="cfields" name="cfields" />
+        <br />
         <div class="plone-btn-group">
           <span class="btn-label">View:</span>
           <button class="plone-btn" type="button" id="add_view" style="display:none">Add view</button>

@@ -31,6 +31,15 @@
       allowed_attributes="resource_inventory button_action save_action"
       />
 
+  <browser:page
+      name="ambidexterity_export"
+      for="Products.CMFPlone.interfaces.IPloneSiteRoot"
+      class="collective.ambidexterity.browser.import_export.ExportView"
+      permission="plone.schemaeditor.ManageSchemata"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+      />
+
+
   <browser:resource
     name="collective.ambidexterity.editor.js"
     file="editor.js"
