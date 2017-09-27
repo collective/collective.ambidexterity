@@ -2,94 +2,47 @@
 collective.ambidexterity
 ==============================================================================
 
-This is currently a set of explorations of the idea of doing Dexterity views, validators, vocabularies and defaults TTW via scripts in portal_resources.
-It's at proof-of-concept stage.
-If it works, we can build a plone.app.theming style UI to edit the portal_resources/ambidexterity space.
+collective.ambidexterity provides through-the-web editing of views, defaults, validators and vocabularies for Dexterity content types.
 
-The general idea is that we will be able to use Dexterity XML to specify a schema like::
+Status of the package
+---------------------
 
-    <schema>
-      <field name="test_integer_field" type="zope.schema.Int">
-        <description/>
-        <required>False</required>
-        <defaultFactory>collective.ambidexterity.default</defaultFactory>
-        <title>Test Integer Field</title>
-      </field>
-      <field name="test_string_field"
-        type="zope.schema.TextLine"
-        form:validator="collective.ambidexterity.validate"
-      >
-        <description/>
-        <required>False</required>
-        <defaultFactory>collective.ambidexterity.default</defaultFactory>
-        <title>Test String Field</title>
-      </field>
-      <field name="test_choice_field" type="zope.schema.Choice">
-        <description/>
-        <required>False</required>
-        <title>Test Choice Field</title>
-        <source>collective.ambidexterity.vocabulary</source>
-      </field>
-    </schema>
+collective.ambidexterity is in early beta.
+It is not yet recommended for use in production sites.
 
-For the Dexterity type "my_simple_type" and we would get::
+The package currently only works in Plone 5.
 
-    portal_resources/ambidexterity/my_simple_type/test_integer_field/default.py
-    portal_resources/ambidexterity/my_simple_type/test_string_field/default.py
-    portal_resources/ambidexterity/my_simple_type/test_string_field/validate.py
-    portal_resources/ambidexterity/my_simple_type/test_choice_field/vocabulary.py
-
-automatically called as appropriate.
-
-The scripts from portal_resources/ambidexterity are executed as untrusted Python.
-
-Defaults
---------
-
-The script is given one value (other than standard builtins):
-"context" -- which is either the creation folder if the item is being
-added or the item if being edited.
-
-The vocabulary should be assigned to "default" in the script
-and should be of the type required by the field.
-
-Vocabularies
+Installation
 ------------
 
-The script is given one value (other than standard builtins):
-"context" -- which is either the creation folder if the item is being
-added or the item if being edited.
+Add `collective.ambidexterity` to the `eggs` list in your Plone 5 buildout.
+Run buildout.
 
-The vocabulary should be assigned to "vocabulary" in the script.
-It should be a list of values or a list of items (value, title).
+Use the add/remove addons option in site setup to activate the package for a particular Plone site.
 
-Validators
-----------
+Quick operation
+---------------
 
-The script is given two values (other than standard builtins):
+Look for the `Ambidexterity` option near the end of site setup.
+This will open the Ambidexterity editor.
 
-    * "context" -- which is either the creation folder if the item is being
-      added or the item if being edited.
+You should be able to add view templates for all Dexterity content types.
+View templates are standard Plone page templates using TAL for dynamic content.
 
-    * "value" -- the field value submitted for validation.
 
-If the validator script determines the value is invalid, it should do
-one of the following:
+Default, validator and vocabulary scripts may be added for all Dexterity content types that you have created through-the-web.
+You may not add default, validator or vocabulary scripts for content types that have been set up via Python packages.
+(Exception: if the content-type's fields are definedd in a `model source` attribute of the FTI, you may add Ambidexterity scripts.)
 
-    * print an error message using Python's "print"; or,
+Default, validator and vocabulary scripts are much like the Scripts (Python) that may be added via the Zope Management Interface.
+They will execute in a Restricted Python environment with the privileges of the logged-in user.
+Limited imports are available.
 
-    * assign an error message to a variable named "error_message".
-
-If the value is valid, do not do either of the above.
-The absence of an error message is taken to mean all is OK.
-
-Views
------
-
-If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type as a text file, it will be usable at @@ambidexterityview.
-
-You may also set other template files and traverse to them at URLs like @@ambidexterityview/custom_file.js.
-No matter the extension, they will be handled as page templates.
+Restricted Python provides a safety net for programmers who don't know the details of the Zope/Plone security model.
+If you are running up against the limitations of Restricted Python, you should consider migrating your Ambidexterity code to a Python package.
+It is important that you understand that the safety net is not perfect: it is not adequate to protect your site from coding by an untrusted user.
+Only highly trusted users should be allowed to use the Ambidexterity editor.
+It is by default restricted to site managers.
 
 Cautions
 --------
@@ -97,17 +50,29 @@ Cautions
 This package marks the `re`, `datetime` and `time` modules as safe for use in RestrictedPython.
 That will affect all PythonScripts.
 
+To do
+-----
+
+Test coverage: pretty good for the nuts and bolts.
+The user interface is currently completely untested.
+If you're up-to-date on robot testing, your assistance would be appreciated.
+
+Docs: Currently rudimentary, but probably adequate for many knowledgeable users.
+
+i18n: Undeveloped.
+
+Accessibility: Undeveloped.
+
 Contribute
 ----------
 
 - Issue Tracker: https://github.com/collective/collective.ambidexterity/issues
 - Source Code: https://github.com/collective/collective.ambidexterity
 
-
 Support
 -------
 
-None!
+Plone community forums: https://community.plone.org/
 
 
 License
