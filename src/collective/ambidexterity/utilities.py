@@ -49,6 +49,11 @@ def getDexterityTypes():
     return pt.objectValues(D_FTI)
 
 
+def getDexterityTypeIds():
+    pt = api.portal.get_tool(name='portal_types')
+    return pt.objectIds(D_FTI)
+
+
 def getSimpleDexterityFTIs():
     # return fti's for types that use a simple Dexterity class
     rez = []
@@ -159,7 +164,7 @@ def contentTypeZip(ctype_name):
     return archive_stream.getvalue()
 
 
-def importResourcesZip(f, ctype_name):
+def importResourcesZip(f):
 
     def makeFolders(folder, path):
         # create folder -- at depth if necessary
@@ -170,14 +175,21 @@ def importResourcesZip(f, ctype_name):
             folder = folder[name]
         return folder
 
+    messages = []
+    dex_types = getDexterityTypeIds()
     ad = getAmbidexterityFolder()
     zf = zipfile.ZipFile(f)
     for name in zf.namelist():
         folder = ad
         head, tail = os.path.split(name)
         if head:
+            if head.split('/')[0] not in dex_types:
+                messages.append("{} is not a Dexterity type; not imported".format(head.split('/')[0]))
+                continue
             folder = makeFolders(ad, head)
         if tail not in folder:
             folder.manage_addFile(tail)
         with zf.open(name) as zfm:
             folder[tail].update_data(zfm.read())
+        messages.append("{} imported successfully.".format(name))
+    return "\n".join(messages)

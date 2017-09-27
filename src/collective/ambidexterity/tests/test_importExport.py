@@ -30,7 +30,7 @@ class TestSetup(unittest.TestCase):
         applyProfile(self.portal, 'collective.ambidexterity:testing')
 
     def test_unauthorizedExport(self):
-        export_view = self.portal.unrestrictedTraverse('@@ambidexterity_export')
+        export_view = self.portal.unrestrictedTraverse('@@ambidexterity-export')
         with self.assertRaises(Forbidden):
             export_view()
 
@@ -46,7 +46,7 @@ class TestSetup(unittest.TestCase):
         form['_authenticator'] = createToken()
         form['ctype'] = 'simple_test_type'
 
-        export_view = self.portal.unrestrictedTraverse('@@ambidexterity_export')
+        export_view = self.portal.unrestrictedTraverse('@@ambidexterity-export')
         rez = export_view()
 
         # check headers
@@ -62,7 +62,7 @@ class TestSetup(unittest.TestCase):
     def test_directImport(self):
         fn = os.path.join(os.path.dirname(__file__), 'export.zip')
         with open(fn, 'rb') as f:
-            utilities.importResourcesZip(f, 'simple_test_type')
+            utilities.importResourcesZip(f)
         ad = self.portal.portal_resources.ambidexterity
         self.assertEqual(ad.keys(), ['simple_test_type'])
         self.assertIn('view.pt', ad.simple_test_type.keys())

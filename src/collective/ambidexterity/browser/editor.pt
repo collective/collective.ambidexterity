@@ -49,6 +49,7 @@ div.plone-btn-group {
 
 <metal:main fill-slot="prefs_configlet_main">
   <tal:main-macro metal:define-macro="main">
+
     <div id="page-intro">
 
       <h1 class="documentFirstHeading" i18n:translate="heading_edit">
@@ -91,10 +92,14 @@ div.plone-btn-group {
 
     <section tal:condition="view/audit_is_clean">
 
-      <form method="POST" action="@@ambidexterity_export" id="export_form" class="plone-btn-group pull-right">
+      <form method="GET" action="@@ambidexterity-import" class="plone-btn-group pull-right">
+        <input class="plone-btn" type="submit" value="Import" />
+      </form>
+      <form method="POST" action="@@ambidexterity-export" id="export_form" class="plone-btn-group pull-right">
+        Content-type resources:
         <input tal:replace="structure context/@@authenticator/authenticator" />
         <input type="hidden" name="ctype" value="" />
-        <input class="plone-btn" type="submit" value="Export content type resources" disabled="disabled" />
+        <input class="plone-btn" type="submit" value="Export" disabled="disabled" />
       </form>
 
 

@@ -42,7 +42,7 @@ class ResyncView(BrowserView):
     def __call__(self):
         PostOnly(self.request)
         CheckAuthenticator(self.request)
-        audit.resynchronize()
+        audit.resynchronize_all()
         self.request.RESPONSE.redirect(self.context.absolute_url() + '/@@ambidexterityeditor')
 
 
