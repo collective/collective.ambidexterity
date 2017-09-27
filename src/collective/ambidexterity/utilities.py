@@ -6,7 +6,9 @@ from plone import api
 from plone.resource.directory import PersistentResourceDirectory
 
 import logging
+import os.path
 import re
+import zipfile
 
 D_FTI = 'Dexterity FTI'
 SIMPLE_DEXTERITY_CLASSES = (
@@ -155,3 +157,27 @@ def contentTypeZip(ctype_name):
     archive_stream = StringIO()
     ctype_folder.exportZip(archive_stream)
     return archive_stream.getvalue()
+
+
+def importResourcesZip(f, ctype_name):
+
+    def makeFolders(folder, path):
+        # create folder -- at depth if necessary
+        names = path.strip('/').split('/')
+        for name in names:
+            if name not in folder:
+                folder.manage_addFolder(name)
+            folder = folder[name]
+        return folder
+
+    ad = getAmbidexterityFolder()
+    zf = zipfile.ZipFile(f)
+    for name in zf.namelist():
+        folder = ad
+        head, tail = os.path.split(name)
+        if head:
+            folder = makeFolders(ad, head)
+        if tail not in folder:
+            folder.manage_addFile(tail)
+        with zf.open(name) as zfm:
+            folder[tail].update_data(zfm.read())

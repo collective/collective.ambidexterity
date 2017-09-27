@@ -2,6 +2,7 @@
 """Test import/export."""
 
 from collective.ambidexterity import default_script
+from collective.ambidexterity import utilities
 from collective.ambidexterity import validator_script
 from collective.ambidexterity import view
 from collective.ambidexterity import vocabulary_script
@@ -11,6 +12,7 @@ from plone.protect import createToken
 from zExceptions import Forbidden
 from StringIO import StringIO
 
+import os.path
 import unittest
 import zipfile
 
@@ -56,3 +58,18 @@ class TestSetup(unittest.TestCase):
 
         # check content
         self.assertTrue(zipfile.is_zipfile(StringIO(rez)))
+
+    def test_directImport(self):
+        fn = os.path.join(os.path.dirname(__file__), 'export.zip')
+        with open(fn, 'rb') as f:
+            utilities.importResourcesZip(f, 'simple_test_type')
+        ad = self.portal.portal_resources.ambidexterity
+        self.assertEqual(ad.keys(), ['simple_test_type'])
+        self.assertIn('view.pt', ad.simple_test_type.keys())
+        self.assertIn('test_string_field', ad.simple_test_type.keys())
+        self.assertIn('default.py', ad.simple_test_type.test_string_field.keys())
+        self.assertIn('validate.py', ad.simple_test_type.test_string_field.keys())
+        self.assertIn('test_integer_field', ad.simple_test_type.keys())
+        self.assertIn('default.py', ad.simple_test_type.test_integer_field.keys())
+        self.assertIn('test_choice_field', ad.simple_test_type.keys())
+        self.assertIn('vocabulary.py', ad.simple_test_type.test_choice_field.keys())
