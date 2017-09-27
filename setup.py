@@ -38,7 +38,6 @@ setup(
     include_package_data=True,
     zip_safe=False,
     install_requires=[
-        'plone.api',
         'Products.GenericSetup',
         'setuptools',
         'RestrictedPython',
