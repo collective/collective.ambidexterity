@@ -14,7 +14,7 @@ long_description = '\n\n'.join([
 
 setup(
     name='collective.ambidexterity',
-    version='1.0b2',
+    version='1.0b3.dev0',
     description="TTW support for Dexterity",
     long_description=long_description,
     # Get more from https://pypi.python.org/pypi?%3Aaction=list_classifiers
