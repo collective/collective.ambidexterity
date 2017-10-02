@@ -104,6 +104,7 @@ div.plone-btn-group {
 
 
       <form id="available_actions">
+        <input tal:replace="structure context/@@authenticator/authenticator" />
         <label for="content_types">Content types:</label> <select id="content_types" name="content_types" />
         <label for="cfields">Fields:</label> <select id="cfields" name="cfields" />
         <br />

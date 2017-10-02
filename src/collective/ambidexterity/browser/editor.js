@@ -36,7 +36,7 @@ require([
 
 
     function get_authenticator() {
-        return $('input[name="_authenticator"]').val();
+        return $('form#available_actions input#[name="_authenticator"]').val();
     }
 
 
