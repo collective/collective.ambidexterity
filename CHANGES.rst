@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b2 (unreleased)
+1.0b2 (2017-10-02)
 ------------------
 
 - The editor would sometimes fail to list any content types. Fixed.
