@@ -16,7 +16,7 @@ SIMPLE_DEXTERITY_CLASSES = (
     'plone.dexterity.content.Item',
 )
 ALLOW_VOCABULARIES = ['zope.schema.Choice', 'zope.schema.Set']
-plone_munge = re.compile(r"""plone_\d+_""", flags=re.IGNORECASE)
+plone_munge = re.compile(r"""^.+?_\d+?_""", flags=re.IGNORECASE)
 
 logger = logging.getLogger('collective.ambidexterity')
 
