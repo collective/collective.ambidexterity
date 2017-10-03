@@ -17,8 +17,11 @@ for name in ('datetime', 'time', 're'):
 # Include their key types
 allow_type(type(re.compile('')))
 allow_type(type(re.match('x', 'x')))
+allow_type(type(datetime.date))  # Make sure we get class methods
+allow_type(type(datetime.datetime))  # class methods
 allow_type(type(datetime.date(2017, 1, 1)))
 allow_type(type(datetime.datetime(2017, 1, 1)))
+allow_type(type(datetime.timedelta(1)))
 
 
 class AmbidexterityProgram(object):

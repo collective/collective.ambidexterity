@@ -5,7 +5,12 @@ Changelog
 1.0b4 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Allow RestrictedPython access to datetime.timedelta type.
+  [smcmahon]
+
+
+- Make sure RestrictedPython allows datetime.date and datetime.datetime class types and not just instance types. This is so we can get at date.today() and datetime.now().
+  [smcmahon]
 
 
 1.0b3 (2017-10-03)

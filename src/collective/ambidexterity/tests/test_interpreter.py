@@ -64,9 +64,6 @@ class TestSetup(unittest.TestCase):
         self.assertEqual(type(rez['tt']), float)
 
     def test_datetime_availability(self):
-        # some module is mis-initializing the security checkers for
-        # datetime.date and datetimes.datetime.
-        # Until that's found and fixed, this will fail.
         import datetime
         ap = AmbidexterityProgram("import datetime; dt = datetime.date(2017, 1, 1)")
         rez = ap.execute()
@@ -77,6 +74,13 @@ class TestSetup(unittest.TestCase):
         ap = AmbidexterityProgram("import datetime; yr = datetime.datetime(2017, 1, 1).year")
         rez = ap.execute()
         self.assertEqual(rez['yr'], 2017)
+        # test class methods for datetime.date and datetime.datetime
+        ap = AmbidexterityProgram("import datetime; today = datetime.date.today()")
+        rez = ap.execute()
+        ap = AmbidexterityProgram("import datetime; now = datetime.datetime.now()")
+        rez = ap.execute()
+        ap = AmbidexterityProgram("import datetime; td1 = datetime.timedelta(1).total_seconds()")
+        rez = ap.execute()
 
     def test_object_access(self):
         # Make sure that our ability to get at a private object is dependent
