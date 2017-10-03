@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b3 (unreleased)
+1.0b3 (2017-10-03)
 ------------------
 
 - Added no-cache headers to all AJAX responses.
