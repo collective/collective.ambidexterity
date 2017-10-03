@@ -63,6 +63,10 @@ class EditorAjax(BrowserView):
             'Content-Type',
             'application/json'
         )
+        self.request.RESPONSE.setHeader(
+            'Cache-Control',
+            'no-cache'
+        )
         return json.dumps(getResourcesInventory())
 
     def button_action(self):
@@ -128,6 +132,10 @@ class EditorAjax(BrowserView):
             'Content-Type',
             'application/json'
         )
+        self.request.RESPONSE.setHeader(
+            'Cache-Control',
+            'no-cache'
+        )
         return json.dumps(result)
 
     def save_action(self):
@@ -161,5 +169,9 @@ class EditorAjax(BrowserView):
         self.request.RESPONSE.setHeader(
             'Content-Type',
             'application/json'
+        )
+        self.request.RESPONSE.setHeader(
+            'Cache-Control',
+            'no-cache'
         )
         return json.dumps(result)
