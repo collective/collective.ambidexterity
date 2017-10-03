@@ -5,7 +5,11 @@ Changelog
 1.0b3 (unreleased)
 ------------------
 
-- Nothing changed yet.
+- Added no-cache headers to all AJAX responses.
+  [smcmahon]
+
+- Fixed an error in a jQuery selector that would cause an editor error loading content-type information. Bug introduced in b2. Fixed.
+  [smcmahon]
 
 
 1.0b2 (2017-10-02)
