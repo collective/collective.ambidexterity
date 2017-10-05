@@ -27,7 +27,7 @@ Setting a dynamic default
     Error handling
 
 Validating a field
-    Validating a string field
+    Validating a string field - ^\+(?:[0-9] ?){6,14}[0-9]$
     Validating a date field
 
 Creating a view template
