@@ -1,11 +1,7 @@
 collective.ambidexterity - Nuts and Bolts
 =========================================
 
-This is currently a set of explorations of the idea of doing Dexterity views, validators, vocabularies and defaults TTW via scripts in portal_resources.
-It's at proof-of-concept stage.
-If it works, we can build a plone.app.theming style UI to edit the portal_resources/ambidexterity space.
-
-The general idea is that we will be able to use Dexterity XML to specify a schema like::
+The general idea is that we use Dexterity XML to specify a schema like::
 
     <schema>
       <field name="test_integer_field" type="zope.schema.Int">
@@ -72,12 +68,7 @@ The script is given two values (other than standard builtins):
 
     * "value" -- the field value submitted for validation.
 
-If the validator script determines the value is invalid, it should do
-one of the following:
-
-    * print an error message using Python's "print"; or,
-
-    * assign an error message to a variable named "error_message".
+If the validator script determines the value is invalid, it should assign an error message to a variable named "error_message".
 
 If the value is valid, do not do either of the above.
 The absence of an error message is taken to mean all is OK.

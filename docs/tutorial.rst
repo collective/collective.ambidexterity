@@ -1,6 +1,57 @@
 Tutorial
 ========
 
+.. figure:: images/dexterity1.png
+    :alt: Dexterity editor with sample field
+
+    The Dexterity field editor showing our sample content type and its two test fields.
+
+.. figure:: images/ambidexterity_editor.png
+    :alt: The Ambidexterity editor.
+
+    The Ambidexterity editor. Note that there is only one option for a built-in content type: to create a custom view.
+
+.. figure:: images/ambidexterity_editor_dropdown.png
+    :alt: The Ambidexterity editor: selecting a content type.
+
+    The Ambidexterity editor: selecting a content type.
+
+.. figure:: images/ambidexterity_editor_field_dropdown.png
+    :alt: The Ambidexterity editor: selecting a field within a content type.
+
+    The Ambidexterity editor: selecting a content type's field. Note that there are new options for our test content type since it was built TTW.
+
+.. figure:: images/validator_edit.png
+    :alt: Editing a validator.
+
+    Editing a validator.
+
+.. figure:: images/default_editor.png
+    :alt: Editing a dynamic default.
+
+    Editing a dynamic default.
+
+.. figure:: images/default_traceback.png
+    :alt: An error adding a simple content type.
+
+    An error adding a content type with a bad default.
+
+.. figure:: images/default_view.png
+    :alt: Dexterity's default view.
+
+    Dexterity's default view for our content type.
+
+.. figure:: images/view_editor.png
+    :alt: Editing a view.
+
+    Editing a view template.
+
+.. figure:: images/updated_view.png
+    :alt: Updated view.
+
+    Our update view.
+
+
 
 ZPT Reference: https://zope.readthedocs.io/en/latest/zope2book/AppendixC.html
 
