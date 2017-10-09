@@ -34,3 +34,4 @@ report.html
 !.travis.yml
 !src/collective
 ._*
+docs/build

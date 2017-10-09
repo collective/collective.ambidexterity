@@ -1,6 +1,5 @@
-==============================================================================
 collective.ambidexterity - Nuts and Bolts
-==============================================================================
+=========================================
 
 This is currently a set of explorations of the idea of doing Dexterity views, validators, vocabularies and defaults TTW via scripts in portal_resources.
 It's at proof-of-concept stage.
