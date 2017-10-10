@@ -42,7 +42,8 @@ require([
 
     function fill_fields(selected) {
         var fields = inventory[selected].fields,
-            sorted_keys = Object.keys(fields);
+            sorted_keys = Object.keys(fields),
+            selected_field = fields_select.val();
 
         fields_select.empty();
         if (sorted_keys.length > 0) {
@@ -63,14 +64,17 @@ require([
             fields_select.prev().hide();
             $("#script_label").hide();
         }
-
+        if (!selected_field) {
+            selected_field = fields_select.children().eq(0).val();
+        }
+        fields_select.val(selected_field);
         fields_select.change();
     }
 
 
     function fill_content_select() {
         var selected = content_type_select.val(),
-        sorted_keys = Object.keys(inventory);
+            sorted_keys = Object.keys(inventory);
 
         content_type_select.empty();
         sorted_keys.sort();
@@ -174,7 +178,7 @@ require([
                         $('#edit_' + value).hide();
                         $('#remove_' + value).hide();
                     }
-                    if (!field_info['allow_vocabulary']) {
+                    if (!field_info.allow_vocabulary) {
                         $('#add_vocabulary').hide();
                     }
                 });
