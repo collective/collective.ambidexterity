@@ -4,6 +4,8 @@ collective.ambidexterity
 
 collective.ambidexterity provides through-the-web editing of views, defaults, validators and vocabularies for Dexterity content types.
 
+Documentation: http://collectiveambidexterity.readthedocs.io
+
 Status of the package
 ---------------------
 
@@ -56,8 +58,6 @@ To do
 Test coverage: pretty good for the nuts and bolts.
 The user interface is currently completely untested.
 If you're up-to-date on robot testing, your assistance would be appreciated.
-
-Docs: Currently rudimentary, but probably adequate for many knowledgeable users.
 
 i18n: Undeveloped.
 
