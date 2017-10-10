@@ -1,7 +1,23 @@
-collective.ambidexterity - Nuts and Bolts
-=========================================
+Nuts and Bolts
+==============
 
-The general idea is that we use Dexterity XML to specify a schema like::
+The Ambidexterity editor is a UI for a mechanism that provides a custom browser view ``@@ambidexterityview`` and a Dexterity *defaultFactory* ``collective.ambidexterity.default``, a *form:validator* ``collective.ambidexterity.validate``, and a vocabulary *source* ``collective.ambidexterity.vocabulary``.
+
+Each of these knows how to do two tricks when called:
+
+* It introspects the calling environment to deduce the content type and field type; and
+* It uses that knowledge to find a matching script or template in ``portal_resources``.
+
+Templates are rendered as usual.
+Scripts are interpreted in ``RestrictedPython`` and each have special globals.
+After script execution, the script's local variables are examined to get results.
+
+Ambidexterity views work for all content types.
+Scripts work only for through-the-web content types where the supermodel XML version of the schema is a property of the factory type information (FTI).
+
+The general idea is that we use Dexterity XML to specify a schema like:
+
+.. code-block:: xml
 
     <schema>
       <field name="test_integer_field" type="zope.schema.Int">
@@ -35,8 +51,6 @@ For the Dexterity type "my_simple_type" and we would get::
     portal_resources/ambidexterity/my_simple_type/test_choice_field/vocabulary.py
 
 automatically called as appropriate.
-
-The scripts from portal_resources/ambidexterity are executed as untrusted Python.
 
 Defaults
 --------
