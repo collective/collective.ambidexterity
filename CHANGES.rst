@@ -5,6 +5,9 @@ Changelog
 1.0b4 (unreleased)
 ------------------
 
+- Add tutorial. Elaborate 'Nuts and Bolts'. Add to readthedocs.org.
+  [smcmahon]
+
 - Allow RestrictedPython access to datetime.timedelta type.
   [smcmahon]
 
