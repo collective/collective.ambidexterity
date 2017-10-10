@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b5 (unreleased)
+1.0b5 (2017-10-10)
 ------------------
 
 - Pushing buttons in the editor would cause the field selection to be lost. Fixed.
