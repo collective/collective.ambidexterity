@@ -2,7 +2,7 @@ Changelog
 =========
 
 
-1.0b4 (unreleased)
+1.0b4 (2017-10-10)
 ------------------
 
 - Add tutorial. Elaborate 'Nuts and Bolts'. Add to readthedocs.org.
