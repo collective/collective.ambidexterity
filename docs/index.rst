@@ -12,8 +12,9 @@ Contents:
    :maxdepth: 1
 
    tutorial
+   export-import
+   restrictedpython
    nuts-bolts
-
 
 
 Indices and tables
