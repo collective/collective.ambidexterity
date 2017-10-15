@@ -59,7 +59,7 @@ The script is given one value (other than standard builtins):
 "context" -- which is either the creation folder if the item is being
 added or the item if being edited.
 
-The vocabulary should be assigned to "default" in the script
+The default value should be assigned to "default" in the script
 and should be of the type required by the field.
 
 Vocabularies
