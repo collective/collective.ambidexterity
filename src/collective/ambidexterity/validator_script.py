@@ -11,14 +11,10 @@
 
     * "value" -- the field value submitted for validation.
 
-    If the validator script determines the value is invalid, it should do
-    one of the following:
+    If the validator script determines the value is invalid,
+    it should assign an error message to a variable named "error_message".
 
-     * print an error message using Python's "print"; or,
-
-     * assign an error message to a variable named "error_message".
-
-    If the value is valid, do not do either of the above.
+    If the value is valid, do not set error_message.
     The absence of an error message is taken to mean all is OK.
 """
 

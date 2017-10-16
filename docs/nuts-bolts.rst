@@ -9,7 +9,7 @@ Each of these knows how to do two tricks when called:
 * It uses that knowledge to find a matching script or template in ``portal_resources``.
 
 Templates are rendered as usual.
-Scripts are interpreted in ``RestrictedPython`` and each have special globals.
+Scripts are interpreted in ``RestrictedPython`` and each has special globals.
 After script execution, the script's local variables are examined to get results.
 
 Ambidexterity views work for all content types.

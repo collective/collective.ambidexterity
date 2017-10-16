@@ -31,7 +31,6 @@ This will open the Ambidexterity editor.
 You should be able to add view templates for all Dexterity content types.
 View templates are standard Plone page templates using TAL for dynamic content.
 
-
 Default, validator and vocabulary scripts may be added for all Dexterity content types that you have created through-the-web.
 You may not add default, validator or vocabulary scripts for content types that have been set up via Python packages.
 (Exception: if the content-type's fields are definedd in a `model source` attribute of the FTI, you may add Ambidexterity scripts.)
