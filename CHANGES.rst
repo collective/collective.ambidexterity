@@ -8,8 +8,8 @@ Changelog
 - With no bug reports or pull requests in nearly two months, we're leaving beta.
 
 
-1.0b5 (2017-10-10)
-------------------
+1.0 (2017-12-03)
+----------------
 
 - Pushing buttons in the editor would cause the field selection to be lost. Fixed.
   [smcmahon]
