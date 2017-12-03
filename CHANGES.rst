@@ -8,6 +8,12 @@ Changelog
 - With no bug reports or pull requests in nearly two months, we're leaving beta.
 
 
+1.1 (unreleased)
+----------------
+
+- Nothing changed yet.
+
+
 1.0 (2017-12-03)
 ----------------
 
