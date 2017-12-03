@@ -9,9 +9,6 @@ Documentation: http://collectiveambidexterity.readthedocs.io
 Status of the package
 ---------------------
 
-collective.ambidexterity is in early beta.
-It is not yet recommended for use in production sites.
-
 The package currently only works in Plone 5.
 
 Installation

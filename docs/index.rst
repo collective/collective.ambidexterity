@@ -6,6 +6,8 @@
 Welcome to Ambidexterity's documentation!
 =========================================
 
+Ambidexterity provides a through-the-web editor for Plone's Dexterity views and field defaults, validators and vocabularies.
+
 Contents:
 
 .. toctree::

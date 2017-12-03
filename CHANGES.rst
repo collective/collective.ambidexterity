@@ -2,10 +2,10 @@ Changelog
 =========
 
 
-1.0b6 (unreleased)
-------------------
+1.0 2017-12-03
+--------------
 
-- Nothing changed yet.
+- With no bug reports or pull requests in nearly two months, we're leaving beta.
 
 
 1.0b5 (2017-10-10)
