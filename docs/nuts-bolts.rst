@@ -90,7 +90,7 @@ The absence of an error message is taken to mean all is OK.
 Views
 -----
 
-If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.portal_type as a text file, it will be usable at @@ambidexterityview.
+If a view.pt template file is placed at portal_resources/ambidexterity/content_type/view.pt as a text file, it will be usable at @@ambidexterityview.
 
 You may also set other template files and traverse to them at URLs like @@ambidexterityview/custom_file.js.
 No matter the extension, they will be handled as page templates.
