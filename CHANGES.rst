@@ -11,7 +11,8 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Using resources in mounted databases would cause an error. Fixed.
+  [instification]
 
 
 1.0 (2017-12-03)
