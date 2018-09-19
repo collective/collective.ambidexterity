@@ -12,7 +12,7 @@
 
 
 from plone import api
-from Products.Five import BrowserView
+from plone.dexterity.browser.view import DefaultView
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from utilities import getContentTypeFolder
@@ -71,12 +71,14 @@ class ViewPageTemplateResource(ViewPageTemplateFile):
         return body, content_type
 
 
-class AmbidexterityView(BrowserView):
+class AmbidexterityView(DefaultView):
     """ A view that fetches the template for a content type
         from portal_resources/ambidexterity/content_type
     """
 
     def __call__(self):
+        self._update()
+        self.update()
         vptr = ViewPageTemplateResource(
             self.context.portal_type,
             template_name=getattr(self, 'section', 'view.pt')
