@@ -144,12 +144,19 @@ def setVocabulary(id, field_name):
     value_element = efind(field_element, 'values')
     if value_element is not None:
         field_element.remove(value_element)
+    vocabulary_parent = field_element
     vocabulary_element = efind(field_element, 'vocabulary')
     if vocabulary_element is not None:
-        field_element.remove(vocabulary_element)
+        vocabulary_parent = vocabulary_element.getparent()
+        vocabulary_parent.remove(vocabulary_element)
 
-    df = etree.SubElement(field_element, qname('source'))
+    df = etree.SubElement(vocabulary_parent, qname('source'))
     df.text = 'collective.ambidexterity.vocabulary'
+
+    # Set a name attribute on the value_type tag for multiple choice fields
+    if field_element.attrib['type'] == 'zope.schema.Set':
+        vocabulary_parent.attrib['name'] = field_element.attrib['name']
+
     setModelSourceFromXML(id, root)
 
 

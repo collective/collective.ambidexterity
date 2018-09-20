@@ -12,6 +12,7 @@ Changelog
 ----------------
 
 - Using resources in mounted databases would cause an error. Fixed.
+- Add support for setting vocabularies on multiple choice fields.
   [instification]
 
 
