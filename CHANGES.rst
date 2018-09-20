@@ -11,7 +11,8 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Provide view access to custom vocabularies created in Ambidexterity.
+  [instification]
 
 
 1.0 (2017-12-03)

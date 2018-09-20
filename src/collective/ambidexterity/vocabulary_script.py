@@ -47,6 +47,10 @@ def vocabulary(context):
     field_name = field.getName()
     ctype_name = field.interface.getName()
     logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
+    return get_vocabulary(context, ctype_name, field_name)
+
+
+def get_vocabulary(context, ctype_name, field_name):
     script = getAmbidexterityFile(ctype_name, field_name, 'vocabulary.py')
     cp = AmbidexterityProgram(script)
     cp_globals = dict(context=context)

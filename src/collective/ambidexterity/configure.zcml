@@ -69,4 +69,12 @@
       handler=".subscribers.resync_if_necessary"
   />
 
+  <browser:page
+      for="*"
+      name="ambidexterity_vocabulary"
+      class=".view.Vocabulary"
+      permission="zope2.Public"
+      allowed_attributes="vocab"
+  />
+
 </configure>
