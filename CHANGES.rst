@@ -11,7 +11,8 @@ Changelog
 1.1 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Add support for setting vocabularies on multiple choice fields.
+  [instification]
 
 
 1.0 (2017-12-03)
