@@ -15,8 +15,10 @@ from plone import api
 from plone.dexterity.browser.view import DefaultView
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
+from plone.dexterity.schema import SCHEMA_CACHE
 from utilities import getContentTypeFolder
 from utilities import logger
+from vocabulary_script import get_vocabulary
 
 
 BASE_VIEW_TEMPLATE = """<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
@@ -106,3 +108,10 @@ def updateViewTemplate(ctype_name, body, template_id="view.pt"):
 def rmViewTemplate(ctype_name, template_id="view.pt"):
     cf = getContentTypeFolder(ctype_name)
     del cf[template_id]
+
+
+class Vocabulary(BrowserView):
+
+    def vocab(self, field_name):
+        ctype_name = SCHEMA_CACHE.get(self.context.portal_type).getName()
+        return get_vocabulary(self.context, ctype_name, field_name)
