@@ -12,6 +12,7 @@
 
 
 from plone import api
+from Products.Five import BrowserView
 from plone.dexterity.browser.view import DefaultView
 from Products.Five.browser.pagetemplatefile import BoundPageTemplate
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
