@@ -64,6 +64,22 @@
       layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
       />
 
+  <browser:page
+      name="ambidexterityedit"
+      for="plone.dexterity.interfaces.IDexterityContainer"
+      class="collective.ambidexterity.edit.AmbidexterityEdit"
+      permission="cmf.ModifyPortalContent"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+      />
+
+  <browser:page
+      name="ambidexterityedit"
+      for="plone.dexterity.interfaces.IDexterityItem"
+      class="collective.ambidexterity.edit.AmbidexterityEdit"
+      permission="cmf.ModifyPortalContent"
+      layer="collective.ambidexterity.interfaces.ICollectiveAmbidexterityLayer"
+      />
+
   <subscriber
       for="plone.schemaeditor.interfaces.ISchemaModifiedEvent"
       handler=".subscribers.resync_if_necessary"
