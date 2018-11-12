@@ -114,6 +114,12 @@ div.plone-btn-group {
           <button class="plone-btn" type="button" id="edit_view" style="display:none">Edit view</button>
           <button class="plone-btn plone-btn-danger" type="button" id="remove_view" style="display:none">Remove view</button>
         </div>
+          <div class="plone-btn-group">
+              <span class="btn-label">Schema:</span>
+              <button class="plone-btn" type="button" id="add_custom_schema" style="display:none">Add custom schema</button>
+              <button class="plone-btn" type="button" id="edit_custom_schema" style="display:none">Edit custom schema</button>
+              <button class="plone-btn plone-btn-danger" type="button" id="remove_custom_schema" style="display:none">Remove custom schema</button>
+          </div>
         <div class="plone-btn-group">
           <span class="btn-label" id="script_label">Scripts:</span>
           <button class="plone-btn" type="button" id="add_default" style="display:none">Add default</button>

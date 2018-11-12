@@ -87,6 +87,8 @@ def getResourcesInventory():
             type_folder = ambidexterity_folder.get(fid)
         if type_folder is not None and type_folder.get('view.pt') is not None:
             content_type['has_view'] = True
+        if type_folder is not None and type_folder.get('schema.py') is not None:
+            content_type['has_custom_schema'] = True
         if content_type['has_model_source']:
             for field, title, ctype in models.getFieldList(fid):
                 if type_folder is not None:

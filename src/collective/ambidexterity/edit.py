@@ -15,6 +15,7 @@ from AccessControl import ModuleSecurityInfo
 from AccessControl import allow_class
 
 from collective.ambidexterity.interpreter import AmbidexterityProgram
+from collective.ambidexterity.utilities import getContentTypeFolder
 from plone.dexterity.browser.edit import DefaultEditForm
 from plone.z3cform import layout
 from zope.interface.interface import InterfaceClass
@@ -55,12 +56,31 @@ class AmbidexterityEditForm(DefaultEditForm):
         tv = getattr(self.schema, '_Element__tagged_values')
         tv = tv and tv or {}
         self.schema._Element__tagged_values = dict(tv)
-        cp = AmbidexterityProgram(SCHEMA_SCRIPT)
-        cp_globals = dict(schema=self.schema)
-        cp.execute(cp_globals)
+        cf = getContentTypeFolder(self.portal_type)
+        script = cf.get('schema.py')
+        if script is not None:
+            cp = AmbidexterityProgram(script.data)
+            cp_globals = dict(schema=self.schema)
+            cp.execute(cp_globals)
         super(AmbidexterityEditForm, self).updateFields()
         self.schema._Element__tagged_values = otv
 
 
 AmbidexterityEdit = layout.wrap_form(AmbidexterityEditForm)
 
+
+def addCustomSchema(ctype_name, template_id="schema.py"):
+    cf = getContentTypeFolder(ctype_name)
+    assert(cf.get(template_id) is None)
+    cf.manage_addFile(template_id)
+    cf[template_id].update_data(SCHEMA_SCRIPT)
+
+
+def updateCustomSchema(ctype_name, body, template_id="schema.py"):
+    cf = getContentTypeFolder(ctype_name)
+    cf[template_id].update_data(body)
+
+
+def rmCustomSchema(ctype_name, template_id="schema.py"):
+    cf = getContentTypeFolder(ctype_name)
+    del cf[template_id]

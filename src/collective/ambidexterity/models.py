@@ -10,6 +10,7 @@ import utilities
 import re
 
 AMBIDEXTERITY_VIEW = '@@ambidexterityview'
+AMBIDEXTERITY_EDIT = '@@ambidexterityedit'
 SCHEMA_NAMESPACE = 'http://namespaces.plone.org/supermodel/schema'
 FORM_NAMESPACE = 'http://namespaces.plone.org/supermodel/form'
 
@@ -210,3 +211,17 @@ def removeAmbidexterityView(id):
     # the default_view must always be in the view methods.
     fti.manage_changeProperties(default_view=default_view)
     fti.manage_changeProperties(view_methods=tuple(view_methods))
+
+
+def setAmbidexterityEdit(id):
+    fti = getFTI(id)
+    aliases = fti.getMethodAliases()
+    aliases['edit'] = AMBIDEXTERITY_EDIT
+    fti.setMethodAliases(aliases)
+
+
+def removeAmbidexterityEdit(id):
+    fti = getFTI(id)
+    aliases = fti.getMethodAliases()
+    aliases['edit'] = '@@edit'
+    fti.setMethodAliases(aliases)

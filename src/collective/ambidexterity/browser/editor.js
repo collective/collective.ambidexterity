@@ -154,6 +154,15 @@ require([
                 $('#edit_view').hide();
                 $('#remove_view').hide();
             }
+            if (inventory[content_type].has_custom_schema) {
+                $('#add_custom_schema').hide();
+                $('#edit_custom_schema').show();
+                $('#remove_custom_schema').show();
+            }else{
+                $('#add_custom_schema').show();
+                $('#edit_custom_schema').hide();
+                $('#remove_custom_schema').hide();
+            }
             $('#export_form input[name="ctype"]').val(content_type);
             if (inventory[content_type].has_view || Object.keys(inventory[content_type].fields).length > 0) {
                 $('#export_form input[type="submit"]').removeAttr('disabled');

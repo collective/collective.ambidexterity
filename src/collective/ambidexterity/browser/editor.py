@@ -6,6 +6,7 @@ from collective.ambidexterity import models
 from collective.ambidexterity import validator_script
 from collective.ambidexterity import vocabulary_script
 from collective.ambidexterity import view as ad_view
+from collective.ambidexterity import edit as ed_view
 from collective.ambidexterity.utilities import getAmbidexterityFile
 from collective.ambidexterity.utilities import getResourcesInventory
 from plone.protect import CheckAuthenticator
@@ -127,6 +128,17 @@ class EditorAjax(BrowserView):
         elif button_id == 'remove_view':
             ad_view.rmViewTemplate(content_type)
             models.removeAmbidexterityView(content_type)
+        elif button_id == 'add_custom_schema':
+            ed_view.addCustomSchema(content_type)
+            models.setAmbidexterityEdit(content_type)
+        elif button_id == 'edit_custom_schema':
+            result = dict(
+                action='edit',
+                source=getAmbidexterityFile(content_type, None, 'schema.py'),
+            )
+        elif button_id == 'remove_custom_schema':
+            ed_view.rmCustomSchema(content_type)
+            models.removeAmbidexterityEdit(content_type)
 
         self.request.RESPONSE.setHeader(
             'Content-Type',
@@ -163,6 +175,9 @@ class EditorAjax(BrowserView):
             result = 'success'
         elif script == 'edit_view':
             ad_view.updateViewTemplate(content_type, body)
+            result = 'success'
+        elif script == 'edit_custom_schema':
+            ed_view.updateCustomSchema(content_type, body)
             result = 'success'
 
         result = dict(result=result)
