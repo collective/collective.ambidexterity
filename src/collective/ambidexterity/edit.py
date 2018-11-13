@@ -29,10 +29,6 @@ SCHEMA_SCRIPT = """# Schema Editor Script
 # provided by plone.autoform. See
 # https://github.com/plone/plone.autoform/blob/master/plone/autoform/autoform.rst
 
-# Example code (to be used on a dexterity File object)
-from plone.autoform.interfaces import OMITTED_KEY
-from z3c.form.interfaces import IEditForm
-schema.setTaggedValue(OMITTED_KEY, ((IEditForm, 'file', True),))
 """
 
 class AmbidexterityEditForm(DefaultEditForm):
@@ -58,11 +54,20 @@ class AmbidexterityEditForm(DefaultEditForm):
         self.schema._Element__tagged_values = dict(tv)
         cf = getContentTypeFolder(self.portal_type)
         script = cf.get('schema.py')
-        if script is not None:
-            cp = AmbidexterityProgram(script.data)
-            cp_globals = dict(schema=self.schema)
+        if script is None:
+            return super(AmbidexterityEditForm, self).updateFields()
+
+        cp = AmbidexterityProgram(script.data)
+        cp_globals = dict(schema=self.schema)
+        try:
             cp.execute(cp_globals)
-        super(AmbidexterityEditForm, self).updateFields()
+            super(AmbidexterityEditForm, self).updateFields()
+        except Exception as e:
+            # Exception is caught, schema reset and exception is re-raised to
+            # prevent the schema from being permanently modified.
+            self.schema._Element__tagged_values = otv
+            super(AmbidexterityEditForm, self).updateFields()
+            raise Exception(e)
         self.schema._Element__tagged_values = otv
 
 
