@@ -14,6 +14,7 @@ Changelog
 - Using resources in mounted databases would cause an error. Fixed.
 - Add support for setting vocabularies on multiple choice fields.
 - Provide view access to custom vocabularies created in Ambidexterity.
+- Provide portal object to vocabulary scripts.
   [instification]
 
 

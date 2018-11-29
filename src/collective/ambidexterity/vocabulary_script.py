@@ -13,6 +13,7 @@
 """
 
 from interpreter import AmbidexterityProgram
+from plone.api import portal
 from utilities import addFieldScript
 from utilities import getAmbidexterityFile
 from utilities import getFrameLocal
@@ -33,6 +34,7 @@ VOCABULARY_SCRIPT = """# Vocabulary script.
 # This script will be executed in a RestrictedPython environment.
 # Local variables available to you:
 #     context -- the folder in which the item is being added.
+#     portal -- the root site object
 # Set your vocabulary by assigning it to "vocabulary".
 # It should be a list of values or a list of (title, value) items.
 
@@ -58,7 +60,7 @@ def vocabulary(context):
 def get_vocabulary(context, ctype_name, field_name):
     script = getAmbidexterityFile(ctype_name, field_name, 'vocabulary.py')
     cp = AmbidexterityProgram(script)
-    cp_globals = dict(context=context)
+    cp_globals = dict(context=context,portal=portal.get())
     result = cp.execute(cp_globals)['vocabulary']
     if len(result) > 0:
         if type(result[0]) not in (types.ListType, types.TupleType):
