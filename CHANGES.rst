@@ -12,6 +12,7 @@ Changelog
 ----------------
 
 - Fix CI tests, disable code-analysis tests
+- Provide portal object to vocabulary scripts.
   [instification]
 
 
