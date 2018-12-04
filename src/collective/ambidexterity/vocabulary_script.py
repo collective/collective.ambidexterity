@@ -11,7 +11,7 @@
     The vocabulary should be assigned to "vocabulary" in the script.
     It should be a list of values or a list of items (value, title).
 """
-
+from AccessControl import Unauthorized
 from interpreter import AmbidexterityProgram
 from utilities import addFieldScript
 from utilities import getAmbidexterityFile
@@ -47,6 +47,15 @@ def vocabulary(context):
     field_name = field.getName()
     ctype_name = field.interface.getName()
     logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
+    vocab = SimpleVocabulary([])
+    try:
+        vocab = get_vocabulary(context, ctype_name, field_name)
+    except Unauthorized:
+        pass
+    return vocab
+
+
+def get_vocabulary(context, ctype_name, field_name):
     script = getAmbidexterityFile(ctype_name, field_name, 'vocabulary.py')
     cp = AmbidexterityProgram(script)
     cp_globals = dict(context=context)
