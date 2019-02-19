@@ -57,8 +57,16 @@ class AmbidexterityEditForm(DefaultEditForm):
         if script is None:
             return super(AmbidexterityEditForm, self).updateFields()
 
+        # Provide the current workflow state of the context
+        state = ''
+        wft = self.context.portal_workflow
+        cur_wf = wft.getWorkflowsFor(self.context)
+        if len(cur_wf) > 0:
+            cur_wf = cur_wf[0].id
+            state = wft.getStatusOf(cur_wf, self.context)['review_state']
+
         cp = AmbidexterityProgram(script.data)
-        cp_globals = dict(schema=self.schema)
+        cp_globals = dict(schema=self.schema, context=self.context, state=state)
         try:
             cp.execute(cp_globals)
             super(AmbidexterityEditForm, self).updateFields()
