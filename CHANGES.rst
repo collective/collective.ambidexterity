@@ -15,6 +15,7 @@ Changelog
 - Add support for setting vocabularies on multiple choice fields.
 - Provide view access to custom vocabularies created in Ambidexterity.
 - Provide portal object to vocabulary scripts.
+- Fix CI tests, disable code-analysis tests
   [instification]
 
 

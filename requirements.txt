@@ -1,0 +1,5 @@
+setuptools==33.1.1
+zc.buildout==2.9.5
+pep8 == 1.7.1
+flake8 == 3.5.0
+six == 1.10.0
