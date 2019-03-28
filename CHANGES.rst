@@ -16,6 +16,8 @@ Changelog
 - Fix CI tests, disable code-analysis tests
 - Provide portal object to vocabulary scripts.
   [instification]
+- Using resources in mounted databases would cause an error. Fixed.
+- Fix CI tests, disable code-analysis tests
 
 
 1.0 (2017-12-03)
