@@ -11,8 +11,8 @@ Changelog
 1.1 (unreleased)
 ----------------
 
+- Using resources in mounted databases would cause an error. Fixed.
 - Fix CI tests, disable code-analysis tests
-  [instification]
 
 
 1.0 (2017-12-03)
