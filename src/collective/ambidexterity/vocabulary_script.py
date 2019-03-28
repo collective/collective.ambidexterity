@@ -49,10 +49,23 @@ def vocabulary(context):
     stack = inspect.stack()
     field = getFrameLocal(stack, 1, 'self')
     field_name = field.getName()
-    if ITypeSchemaContext.providedBy(context):
-        ctype_name = context.schema.getName()
-    else:
-        ctype_name = SCHEMA_CACHE.get(context.portal_type).getName()
+    ctype_name = None
+    try:
+        ctype_name = field.interface.getName()
+    except AttributeError:
+
+        # There is no way to find out if we are an add form or an edit form
+        # from the context. In an add form, the context is the containing folder
+        # So we check the url to see if we are an add form
+        import re
+        m = re.match(r'.*\+\+add\+\+([a-z]+)$', context.REQUEST.getURL())
+        if m:
+            ctype_name = SCHEMA_CACHE.get(m.group(1)).getName()
+        else:
+            if ITypeSchemaContext.providedBy(context):
+                ctype_name = context.schema.getName()
+            else:
+                ctype_name = SCHEMA_CACHE.get(context.portal_type).getName()
     logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
     vocab = SimpleVocabulary([])
     try:
