@@ -11,7 +11,7 @@
     The vocabulary should be assigned to "vocabulary" in the script.
     It should be a list of values or a list of items (value, title).
 """
-
+from AccessControl import Unauthorized
 from interpreter import AmbidexterityProgram
 from plone.api import portal
 from utilities import addFieldScript
@@ -54,7 +54,12 @@ def vocabulary(context):
     else:
         ctype_name = SCHEMA_CACHE.get(context.portal_type).getName()
     logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
-    return get_vocabulary(context, ctype_name, field_name)
+    vocab = SimpleVocabulary([])
+    try:
+        vocab = get_vocabulary(context, ctype_name, field_name)
+    except Unauthorized:
+        pass
+    return vocab
 
 
 def get_vocabulary(context, ctype_name, field_name):
