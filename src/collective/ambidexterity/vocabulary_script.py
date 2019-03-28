@@ -22,6 +22,8 @@ from utilities import updateFieldScript
 from zope.interface import provider
 from zope.schema.interfaces import IContextSourceBinder
 from zope.schema.vocabulary import SimpleVocabulary
+from plone.app.dexterity.browser.types import ITypeSchemaContext
+from plone.dexterity.schema import SCHEMA_CACHE
 
 import inspect
 import types
@@ -45,7 +47,10 @@ def vocabulary(context):
     stack = inspect.stack()
     field = getFrameLocal(stack, 1, 'self')
     field_name = field.getName()
-    ctype_name = field.interface.getName()
+    if ITypeSchemaContext.providedBy(context):
+        ctype_name = context.schema.getName()
+    else:
+        ctype_name = SCHEMA_CACHE.get(context.portal_type).getName()
     logger.debug('validator called for {0}, {1}'.format(ctype_name, field_name))
     return get_vocabulary(context, ctype_name, field_name)
 
