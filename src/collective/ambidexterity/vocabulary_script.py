@@ -58,7 +58,7 @@ def vocabulary(context):
         # from the context. In an add form, the context is the containing folder
         # So we check the url to see if we are an add form
         import re
-        m = re.match(r'.*\+\+add\+\+([a-z]+)$', context.REQUEST.getURL())
+        m = re.match(r'.*\+\+add\+\+([A-Za-z_\-\.]+)$', context.REQUEST.getURL())
         if m:
             ctype_name = SCHEMA_CACHE.get(m.group(1)).getName()
         else:
